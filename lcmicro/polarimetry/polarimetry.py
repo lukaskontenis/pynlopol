@@ -90,7 +90,7 @@ def get_mueller_mat(element, theta=0, **kwargs):
         mat[3, 2] = -s
         mat[3, 3] = c
 
-    elif element in ("pol", "polarizer"):
+    elif element in ("plz", "pol", "polarizer"):
         mat[0, 0] = 1
         mat[0, 1] = 1
         mat[1, 0] = 1
