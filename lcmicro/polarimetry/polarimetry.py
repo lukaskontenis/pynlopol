@@ -1,11 +1,13 @@
 
-""" lcmicro - a Python library for nonlinear microscopy and polarimetry.
+"""Linear polarimetry.
 
-This module contains polarimetry routines
+This module is part of lcmicro, a Python library for nonlinear microscopy and
+polarimetry.
 
 Copyright 2015-2020 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
+
 import numpy as np
 from numpy import zeros, sin, cos, pi
 import matplotlib.pyplot as plt
@@ -15,7 +17,7 @@ from lklib.plot import add_x_marker, add_y_marker
 
 
 def col_vec(arr):
-    """Make an ndarray column vector."""
+    """Convert array to a column vector."""
     vec = np.array(arr)
     vec.shape = (len(vec), 1)
     return vec
@@ -27,7 +29,7 @@ def get_eps():
 
 
 def tensor_eq(tns1, tns2):
-    """Check if two tensors are equal within the floating point precision.
+    """Check if two tensors are equal within floating point precision.
 
     Works for vectors and matrices too.
     """
@@ -153,9 +155,9 @@ def get_waveplate_thickness(
     Default birefringence is 0.0092 for a quartz waveplate in green. Thickess
     is returned in the same units as wavelength.
     """
-    if plate_type is 'hwp':
+    if plate_type == 'hwp':
         fac = 1
-    elif plate_type is 'qwp':
+    elif plate_type == 'qwp':
         fac = 0.5
     else:
         print("Unsupported plate type " + plate_type)
@@ -177,13 +179,15 @@ def get_waveplate_retardation(wavl=None, biref=0.0092, thickness=None):
 
 def plot_waveplate_response(
         plate_type='hwp', rtrd=None, title_str=None, finalize_figure=True):
-    """Plot intensity transited through a rotatating waveplate and a polarizer.
+    """Plot waveplate transmission response.
 
+    Plot the intensity transmited through a rotatating waveplate and a fixed
+    polarizer as a function of anle.
     """
     if rtrd is None:
-        if plate_type is 'hwp':
+        if plate_type == 'hwp':
             rtrd = 0.5
-        elif plate_type is 'qwp':
+        elif plate_type == 'qwp':
             rtrd = 0.25
         else:
             print("Unsupported plate type " + plate_type)
