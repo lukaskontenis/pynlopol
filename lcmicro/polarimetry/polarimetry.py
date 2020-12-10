@@ -115,9 +115,15 @@ def get_stokes_vec(state):
     """Get the Stokes vector of ``state``."""
     svec = zeros([4, 1])
 
-    if not isstring(state):
-        # Linear polarizations. Gamma happens to be equal to LP orientation
-        gamma = state / 180 * pi
+    try:
+        lp_angle = float(state)
+    except Exception:
+        lp_angle = None
+
+    if lp_angle is not None:
+        # The gamma angle is equal to the polarization angle for purely linear
+        # states. The omega angle is zero for linear states.
+        gamma = lp_angle / 180 * pi
         omega = 0
     else:
         state = state.lower()
@@ -126,12 +132,6 @@ def get_stokes_vec(state):
             omega = 0
         elif state == "vlp":
             gamma = pi/2
-            omega = 0
-        elif state == "+45":
-            gamma = pi/4
-            omega = 0
-        elif state == "-45":
-            gamma = -pi/4
             omega = 0
         elif state == "rcp":
             gamma = 0
