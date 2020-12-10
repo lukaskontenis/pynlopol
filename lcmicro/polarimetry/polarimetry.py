@@ -27,12 +27,16 @@ def get_eps():
     return np.finfo('float64').eps
 
 
-def tensor_eq(tns1, tns2):
+def tensor_eq(tns1, tns2, thr=get_eps()):
     """Check if two tensors are equal within floating point precision.
 
     Works for vectors and matrices too.
     """
-    return (np.abs(tns1 - tns2) <= get_eps()).all()
+    if isinstance(tns1, list):
+        tns1 = np.array(tns1)
+    if isinstance(tns2, list):
+        tns1 = np.array(tns2)
+    return (np.abs(tns1 - tns2) <= thr).all()
 
 
 def rot_mueller_mat(mat, theta=0):
