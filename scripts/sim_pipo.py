@@ -68,7 +68,7 @@ if num_args > 4:
 
 if sample_name is 'collagen':
     symmetry_str = 'c6v'
-elif sample is 'zcq':
+elif sample_name is 'zcq':
     symmetry_str = 'd3'
 
 print("\nSample name: " + sample_name)
