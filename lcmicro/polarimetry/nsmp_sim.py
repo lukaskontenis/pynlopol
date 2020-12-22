@@ -15,6 +15,7 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 from lklib.util import round_to
 from lklib.plot import export_figure
@@ -23,18 +24,16 @@ from lklib.image import make_gif
 
 from lcmicro.polarimetry.gen_pol_state_sequence import gen_pol_state_sequence
 from lcmicro.polarimetry.nsmp import get_nsm_matrix
-from lcmicro.polarimetry.nsmp_common import get_nsvec, get_nsmp_state_order
+from lcmicro.polarimetry.nsmp_common import get_nsvec, get_nsmp_state_order, get_num_states
 from lcmicro.polarimetry.polarimetry import get_stokes_vec, get_mueller_mat
 
 
-def simulate_pipo(trunc_thr=None, **kwargs):
+def simulate_pipo(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
     """Simulate SHG PIPO response of a sample.
 
     The code currenlty works for a pipo_8x8 state set only. Input and output
     states are assumed to be HLP. PSA polarizer is assumed to be at HLP.
     """
-    pset_name = 'pipo_8x8'
-
     # Get PSG and PSA waveplate angles
     pol_angles = gen_pol_state_sequence(pset_name)[1]
     psg_hwp = pol_angles[0]
@@ -87,7 +86,7 @@ def simulate_pipo(trunc_thr=None, **kwargs):
 
 
 def plot_pipo(
-        data, title_str=None, round_to_thr=True, thr=1E-3,
+        data, title_str=None, round_to_thr=True, thr=1E-3, pset_name='pipo_8x8',
         export_fig=False, fig_file_name=None, show_fig=True):
     """Plot a PIPO map.
 
@@ -103,15 +102,40 @@ def plot_pipo(
         # and do not distract from the significant values
         data = np.round(data/thr)*thr
 
-    psg_states, psa_states = get_nsmp_state_order('pipo_8x8')
+    num_psg_states, num_psa_states = get_num_states(pset_name)
+    psg_states, psa_states = get_nsmp_state_order(pset_name)
+
+    # When adding x and y ticks for a small number of PSG and PSA states, it's
+    # best tick each state and center the tick on the pixel. For a large number
+    # of states, it's better to place ticks automatically on the angle x and y
+    # axes by setting the image extent.
+    if num_psg_states <= 10 or num_psa_states <= 10:
+        extent = None
+    else:
+        extent = [float(x) for x in [psg_states[0], psg_states[-1], psa_states[0], psa_states[-1]]]
 
     # Plot PIPO map
-    plt.imshow(data, origin='lower', cmap='gray')
+    plt.imshow(data, origin='lower', cmap='gray', extent=extent)
 
-    # Add state label
+    # Add state labels
     plt.gca()
-    plt.xticks(range(8), psg_states)
-    plt.yticks(range(8), psa_states)
+    if num_psg_states <= 10:
+        # Tick every state
+        plt.xticks(range(num_psg_states), psg_states)
+    if num_psa_states <= 10:
+        plt.yticks(range(num_psa_states), psa_states)
+    else:
+        # Generate ticks automatically using 60-based 1, 2, 3, 6 step
+        # multiples, e.g.:
+        #   0, 10,  20,  30
+        #   0, 20,  40,  60
+        #   0, 30,  60,  90
+        #   0, 60, 120, 180
+        # Automatic ticking defaults to a 10-based 1, 2, 4, 5, 10, which does
+        # not work well for angles
+        plt.gca().xaxis.set_major_locator(MaxNLocator(steps=[1, 2, 3, 6]))
+        plt.gca().yaxis.set_major_locator(MaxNLocator(steps=[1, 2, 3, 6]))
+
     plt.xlabel('Input, deg')
     plt.ylabel('Output, deg')
 
@@ -129,11 +153,13 @@ def plot_pipo(
         plt.show()
 
 
-def make_pipo_animation_delta(sample='zcq', num_steps=9, fps=3):
+def make_pipo_animation_delta(
+    sample='zcq', num_steps=9, fps=3, pset_name='pipo_100x100'):
     """Make PIPO map GIF of a sample by varying delta.
 
     Args:
         sample - Sample name
+        pset_name - Polarization set name
         num_steps - Number of delta steps in aniation
         fps - Display FPS of the GIF
     """
@@ -156,8 +182,12 @@ def make_pipo_animation_delta(sample='zcq', num_steps=9, fps=3):
     file_names = []
     for ind, delta in enumerate(delta_arr):
         plt.clf()
-        pipo_data = simulate_pipo(symmetry_str=symmetry_str, zzz=zzz, delta=delta)
-        plot_pipo(pipo_data, show_fig=False)
+
+        pipo_data = simulate_pipo(
+            symmetry_str=symmetry_str, zzz=zzz, delta=delta,
+            pset_name=pset_name)
+
+        plot_pipo(pipo_data, show_fig=False, pset_name=pset_name)
         plt.title(title_str + " PIPO map, delta={:.1f} deg".format(delta*180/np.pi))
         print("Exporting frame {:d}".format(ind))
         file_name = 'frame_{:d}.png'.format(ind)
@@ -175,7 +205,7 @@ def make_pipo_animation_delta(sample='zcq', num_steps=9, fps=3):
 
 
 def make_pipo_animation_zzz(
-        sample='collagen', num_steps=20, fps=3, **kwargs):
+        sample='collagen', num_steps=20, fps=3, pset_name='pipo_100x100', **kwargs):
     """Make PIPO map GIF of a sample by varying zzz.
 
     Args:
@@ -192,8 +222,12 @@ def make_pipo_animation_zzz(
     file_names = []
     for ind, zzz in enumerate(zzz_arr):
         plt.clf()
-        pipo_data = simulate_pipo(symmetry_str=symmetry_str, zzz=zzz, delta=delta)
-        plot_pipo(pipo_data, show_fig=False)
+
+        pipo_data = simulate_pipo(
+            symmetry_str=symmetry_str, zzz=zzz, delta=delta,
+            pset_name=pset_name)
+
+        plot_pipo(pipo_data, show_fig=False, pset_name=pset_name)
 
         plt.title("Collagen R={:.2f}".format(zzz) + " PIPO map, delta={:.1f} deg".format(delta*180/np.pi))
         print("Exporting frame {:d}".format(ind))

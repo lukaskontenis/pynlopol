@@ -298,15 +298,14 @@ def get_nsvec(svec, nlord=2):
 
 def get_num_states(pset_name):
     """Get the number of PSG and PSA states in the polarization state set."""
-    validate_pset_name(pset_name)
-
     if is_pset_pipo(pset_name):
-        ind = pset_name.find('x')
-        num_psg_states = int(pset_name[ind-1])
-        num_psa_states = int(pset_name[ind+1])
+        ind1 = pset_name.find('_')
+        ind2 = pset_name.find('x')
+        num_psg_states = int(pset_name[ind1+1:ind2])
+        num_psa_states = int(pset_name[ind2+1:])
         num_states = num_psg_states * num_psa_states
-        if num_states < 1 or num_states > 512:
-            print("Only 1 to 512 PIPO states are supported")
+        if num_states < 1 or num_states > 1E6:
+            print("Only 1 to 1M PIPO states are supported")
 
     elif pset_name == 'shg_nsmp':
         num_psg_states = 9
@@ -348,14 +347,17 @@ def get_nsmp_state_order(pset_name):
 
 def validate_pset_name(pset_name):
     """Make sure the polarization state set name is a valid string."""
-    valid_pset_names = {'cars', 'thg_nsmp', 'shg_nsmp', 'pipo_8x8', 'pipo_9x9', 'pipo_18x18', 'pipo_4x4'}
+    valid_pset_names = {'cars', 'thg_nsmp', 'shg_nsmp'}
 
-    if pset_name not in valid_pset_names:
+    if is_pset_pipo(pset_name):
+        num_psg_states, num_psa_states = get_num_states(pset_name)
+        if num_psg_states != num_psa_states:
+            raise(Exception("Only rectangular PIPO sequences are supported"))
+    elif pset_name not in valid_pset_names:
         raise(Exception("Sequence '{:s}' is not valid".format(pset_name)))
 
 
 def is_pset_pipo(pset_name):
     """Return true if the polarization state set is a PIPO set."""
-    validate_pset_name(pset_name)
-    return pset_name[0:4] == 'pipo'
+    return pset_name[:5] == 'pipo_'
 
