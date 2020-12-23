@@ -338,7 +338,7 @@ def delta_alpha_2_omega_psi(delta=None, alpha=None):
     The delta, angle corresponds to in-plane, out-of-plane rotation notation,
     whereas omega, psi are the proper Euler rotation angles.
     """
-    if alpha is None:
+    if alpha is None or alpha == 0:
         omega = delta
         psi = 0
     else:
