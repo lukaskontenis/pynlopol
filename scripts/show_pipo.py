@@ -32,10 +32,12 @@ num_args = len(sys.argv)
 if num_args < 2:
     file_names = list_files_with_extension(ext='dat')
     if len(file_names) == 1:
-        file_name = file_names[0]
+        file_name = os.path.basename(file_names[0])
         print("Found a single dat file '{:s}s', loading it".format(file_name))
     else:
         print("More than one dat file found, specify which to use:")
+else:
+    file_name = sys.argv[1]
 
 if file_name is None:
     print("No input provided. Specify a file name using:")

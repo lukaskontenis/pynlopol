@@ -8,6 +8,7 @@ polarimetry.
 Copyright 2015-2020 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -92,6 +93,6 @@ def make_pipo_fig(file_name):
     """Make a PIPO figure from a dataset."""
     pipo_arr = load_pipo(file_name)
 
-    title_str = 'PIPO ' + file_name
+    title_str = 'PIPO ' + os.path.basename(file_name)
     plot_pipo(pipo_arr, title_str=title_str, export_fig=True)
 
