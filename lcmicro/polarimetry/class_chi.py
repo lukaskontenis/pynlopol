@@ -81,20 +81,26 @@ class ClassChi:
 
             self.expand()
 
-        elif symmetry_str == 'd3':
+        elif symmetry_str in ['d3', 'zcq']:
             # D3 tensor
+            # NOTE: In the current implementation, 'd3' and 'zcq' are used
+            # interchangeably to denote the formal D3 symmetry class. The z-cut
+            # quartz case is actually the D3 tensor, for which the optical axis
+            # is along X, rotated so that the optical axis becomes along Z.
+            # This should not be an issue, as long as the D3 symmetry is used
+            # only in this manner
             if self.nlorder == 2:
                 xxx = 1
                 xyz = 0
 
-                # The textbook contracted tensor given below is for the case
-                # where the beam propagation is along the X optical axis. A
-                # notable use of the D3 symmtry class if for z-cut quartz where
-                # the beam is propagating along the Z optical axis. To obtain
-                # the D3 tensor in the z-cut quartz ssample case rotate this
-                # tensor by 90 deg about X and 30 deg about Y.
+                # The contracted tensor given below is for the case where the
+                # beam propagates along the X axis. A notable use of the D3
+                # symmtry class if for z-cut quartz where the beam propagates
+                # along Z. To obtain the D3 tensor in the z-cut quartz case,
+                # the given tensor needs to be rotated by 90 deg about X
+                # followed by a 30 deg rotation about Y.
                 #
-                # Note that Kleinman symmetry is assumed and zxy=xyz
+                # Kleinman symmetry is assumed and zxy=xyz
                 self.chid = np.array([
                     [xxx, -xxx,   0, xyz,    0,    0],
                     [  0,    0,   0,   0, -xyz, -xxx],
