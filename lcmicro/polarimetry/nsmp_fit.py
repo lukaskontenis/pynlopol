@@ -12,12 +12,15 @@ Contact: dse.ssd@gmail.com
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import least_squares
+from scipy.interpolate import interpn
+import time
 
 from lklib.plot import export_figure
 from lklib.string import get_human_val_str
 
 from lcmicro.proc import load_pipo
 from lcmicro.polarimetry.nsmp_sim import simulate_pipo
+from lcmicro.polarimetry.report import plot_pipo
 
 def unwrap_angle(angle, period=np.pi, plus_minus_range=True):
     """Unwrap angle to value to [-period/2, period/2] range."""
@@ -124,6 +127,7 @@ def print_fit_par(fit_model=None, fit_result=None):
 
 def pipo_fitfun(
         par, xdata, data, fit_model='zcq',
+        fit_accel=None,
         print_progress=False, plot_progress=False):
     symmetry_str = fit_model
 
@@ -138,6 +142,16 @@ def pipo_fitfun(
         delta_period = 180/180*np.pi
 
     delta = unwrap_angle(delta, delta_period, plus_minus_range=False)
+
+    if fit_accel is not None:
+        try:
+            mapind = int(interpn(
+                fit_accel['pargrid'], fit_accel['mapinds'], [delta, zzz],
+                method='nearest', bounds_error=True))
+        except ValueError:
+            print('val error')
+        fit_data = ampl*fit_accel['maps'][mapind]
+    else:
         fit_data = ampl*simulate_pipo(symmetry_str=symmetry_str, delta=delta, zzz=zzz)
 
     if np.any(np.isnan(fit_data)):
@@ -162,6 +176,8 @@ def pipo_fitfun(
         if fit_model == 'c6v':
             msg += ", R = {:s}".format(zzz_str)
         msg += ", err = {:s}".format(err_str)
+        if fit_accel is not None:
+            msg += ", mapind = {:d}".format(mapind)
         print(msg)
     else:
         print('.', end='', flush=True)
@@ -171,6 +187,7 @@ def pipo_fitfun(
 
 def fit_pipo(
         pipo_arr=None, file_name=None, fit_model='zcq', plot_progress=False,
+        use_fit_accel=False,
         **kwargs):
 
     if pipo_arr is None:
@@ -189,16 +206,58 @@ def fit_pipo(
 
     tstart = time.time()
 
+    fit_accel = None
+    if use_fit_accel:
+        delta_min = 0/180*np.pi
+        delta_max = 180/180*np.pi
+        num_delta = 25
+        delta_step = (delta_max - delta_min)/num_delta
+        delta_arr = np.linspace(delta_min, delta_max, num_delta)
+
+        zzz_min = 1
+        zzz_max = 2
+        num_zzz = 25
+        zzz_step = (zzz_max - zzz_min)/num_zzz
+        zzz_arr = np.linspace(zzz_min, zzz_max, num_zzz)
+
+        mapinds = np.reshape(np.arange(0, num_delta*num_zzz), [num_delta, num_zzz])
+        accel_file_name = 'fit_accel_c6v.npy'
+        try:
+            maps = np.load(accel_file_name)
+            print("Loaded fit accel data from '{:s}'".format(accel_file_name))
+        except:
+            maps = np.ndarray([num_delta*num_zzz, 8, 8])
+            mapind = 0
+            for delta_ind, delta in enumerate(delta_arr):
+                for zzz_ind, zzz in enumerate(zzz_arr):
+                    print("Map {:d} of {:d}".format(mapind + 1, len(maps)))
+                    mapind = mapinds[delta_ind, zzz_ind]
+                    maps[mapind, :, :] = simulate_pipo(symmetry_str=fit_model, delta=delta, zzz=zzz)
+            print("Saving fit accel data to '{:s}'".format(accel_file_name))
+            np.save(accel_file_name, maps)
+
+        fit_accel = {}
+        fit_accel['pargrid'] = (delta_arr, zzz_arr)
+        fit_accel['mapinds'] = mapinds
+        fit_accel['maps'] = maps
+
+        diff_step = None
+        if fit_model == 'zcq':
+            diff_step = [0.1, 2*delta_step]
+        elif fit_model == 'c6v':
+            diff_step = [0.1, 2*delta_step, zzz_step]
+
     fit_cfg = {
         'fit_model': fit_model,
         'plot_progress': plot_progress,
+        'print_progress': False,
+        'fit_accel': fit_accel,
     }
 
     print("Fitting data", end='')
 
+    fit_result = least_squares(pipo_fitfun, guess_par, args=(0, pipo_arr), diff_step=diff_step, kwargs=fit_cfg)
 
-    print("Fitting data", end='')
-    fit_result = least_squares(pipo_fitfun, guess_par, args=(0, pipo_arr), kwargs=fit_cfg)
     print("Done")
     num_eval = fit_result.nfev + fit_result.njev
     print("Number of fit evaluations: {:d}".format(num_eval))
