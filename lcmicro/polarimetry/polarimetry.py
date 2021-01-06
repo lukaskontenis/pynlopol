@@ -139,6 +139,12 @@ def get_stokes_vec(state):
         elif state == "lcp":
             gamma = 0
             omega = -pi/4
+        elif state == 'rep':
+            gamma = pi/2
+            omega = pi/8
+        elif state == 'lep':
+            gamma = pi/4
+            omega = -pi/8
         else:
             print('State ''{:s}'' not defined'.format(state))
 
