@@ -34,7 +34,7 @@ def simulate_pipo(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
     states are assumed to be HLP. PSA polarizer is assumed to be at HLP.
     """
     # Get PSG and PSA waveplate angles
-    pol_angles = gen_pol_state_sequence(pset_name)[1]
+    pol_angles = gen_pol_state_sequence(pset_name, vlvl=0)[1]
     psg_hwp = pol_angles[0]
     psg_qwp = pol_angles[1]
     psa_hwp = pol_angles[2]
