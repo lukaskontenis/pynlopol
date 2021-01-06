@@ -31,31 +31,40 @@ def plot_pipo_fit(
         data, fit_model=None, fit_par=None, fit_data=None,
         show_fig=False, new_fig=True,
         export_fig=False, fig_file_name=None, **kwargs):
-    if fit_model != 'zcq':
-        raise(Exception("Only zcq fit model is currently supported"))
+    if fit_model not in ['zcq', 'c6v']:
+        raise(Exception("Unsupported fitting model"))
     if fit_par is None:
         raise(Exception("No fit parameters given"))
-    if len(fit_par) != 2:
+    if (fit_model == 'zcq' and len(fit_par) != 2) or \
+        (fit_model == 'c6v' and len(fit_par) != 3):
         raise(Exception("Incorrect number of fit parameters"))
 
+    zzz = None
     if fit_model == 'zcq':
         ampl = fit_par[0]
         delta = fit_par[1]
         delta_period = 60/180*np.pi
         symmetry_str = 'd3'
+    elif fit_model == 'c6v':
+        ampl = fit_par[0]
+        delta = fit_par[1]
+        zzz = fit_par[2]
+        delta_period = 180/180*np.pi
+        symmetry_str = 'c6v'
 
     if fit_data is None:
-        fit_data = ampl*simulate_pipo(symmetry_str=symmetry_str, delta=delta)
+        fit_data = ampl*simulate_pipo(symmetry_str=symmetry_str, delta=delta, zzz=zzz)
 
     res = data - fit_data
     err = np.mean(np.sqrt(res**2))
 
-    ampl_str = get_human_val_str(ampl)
-    delta_str = get_human_val_str(unwrap_angle(delta, period=delta_period)/np.pi*180, num_sig_fig=3)
+    ampl_str = get_human_val_str(ampl, suppress_suffix='m')
+    zzz_str = get_human_val_str(zzz, num_sig_fig=3, suppress_suffix='m')
+    delta_str = get_human_val_str(unwrap_angle(delta, period=delta_period)/np.pi*180, num_sig_fig=3, suppress_suffix='m')
     err_str = get_human_val_str(err)
 
     if new_fig:
-        plt.figure(figsize=[10, 5])
+        plt.figure(figsize=[12, 5])
     else:
         plt.clf()
 
@@ -64,7 +73,10 @@ def plot_pipo_fit(
     plt.title('Data')
     plt.subplot(1, 3, 2)
     plt.imshow(fit_data, cmap='gray')
-    plt.title('Fit model ''{:s}'', A = {:s}, δ = {:s}°'.format(fit_model, ampl_str, delta_str))
+    if fit_model == 'zcq':
+        plt.title('Fit model ''{:s}''\nA = {:s}, δ = {:s}°'.format(fit_model, ampl_str, delta_str))
+    else:
+        plt.title('Fit model ''{:s}''\nA = {:s}, R = {:s}, δ = {:s}°'.format(fit_model, ampl_str, zzz_str, delta_str))
     plt.subplot(1, 3, 3)
     plt.imshow(res, cmap='coolwarm')
     plt.title('Residuals, err = {:s}'.format(err_str))
@@ -82,14 +94,22 @@ def plot_pipo_fit(
 
 def print_fit_par(fit_model=None, fit_result=None):
     print("=== Fit result ===")
+
+    zzz = None
     if fit_model == 'zcq':
         ampl = fit_result.x[0]
         delta = fit_result.x[1]
         delta_period = 60/180*np.pi
+    elif fit_model == 'c6v':
+        ampl = fit_result.x[0]
+        delta = fit_result.x[1]
+        zzz = fit_result.x[2]
+        delta_period = 180/180*np.pi
 
     err = fit_result.fun[0]
 
-    ampl_str = get_human_val_str(ampl)
+    ampl_str = get_human_val_str(ampl, suppress_suffix='m')
+    zzz_str = get_human_val_str(zzz, num_sig_fig=3, suppress_suffix='m')
     delta_str = get_human_val_str(unwrap_angle(delta, period=delta_period)/np.pi*180, num_sig_fig=3)
     err_str = get_human_val_str(err)
 
@@ -97,14 +117,28 @@ def print_fit_par(fit_model=None, fit_result=None):
     print('Parameters:')
     print('\tA = {:s}'.format(ampl_str))
     print('\tδ = {:s}°'.format(delta_str))
+    if zzz is not None:
+        print('\tzzz = {:s}°'.format(zzz_str))
     print('RMS residual error: {:s}\n'.format(err_str))
 
 
-def pipo_fitfun(par, xdata, data, fit_model='zcq', print_progress=False, plot_progress=False):
-    ampl = par[0]
-    delta = par[1]
+def pipo_fitfun(
+        par, xdata, data, fit_model='zcq',
+        print_progress=False, plot_progress=False):
     symmetry_str = fit_model
-    fit_data = ampl*simulate_pipo(symmetry_str=symmetry_str, delta=delta)
+
+    zzz = None
+    if fit_model in ['zcq', 'c6v']:
+        ampl = par[0]
+        delta = par[1]
+        delta_period = 60/180*np.pi
+
+    if fit_model == 'c6v':
+        zzz = par[2]
+        delta_period = 180/180*np.pi
+
+    delta = unwrap_angle(delta, delta_period, plus_minus_range=False)
+        fit_data = ampl*simulate_pipo(symmetry_str=symmetry_str, delta=delta, zzz=zzz)
 
     if np.any(np.isnan(fit_data)):
         print("NaN in fit model")
@@ -113,7 +147,8 @@ def pipo_fitfun(par, xdata, data, fit_model='zcq', print_progress=False, plot_pr
     err = np.mean(np.sqrt(res**2))
 
     if plot_progress or print_progress:
-        ampl_str = get_human_val_str(ampl)
+        ampl_str = get_human_val_str(ampl, suppress_suffix='m')
+        zzz_str = get_human_val_str(zzz, num_sig_fig=3, suppress_suffix='m')
         delta_str = get_human_val_str(unwrap_angle(delta)/np.pi*180, num_sig_fig=3)
         err_str = get_human_val_str(err)
 
@@ -123,36 +158,55 @@ def pipo_fitfun(par, xdata, data, fit_model='zcq', print_progress=False, plot_pr
         plt.pause(0.001)
 
     if print_progress:
-        print("A = {:s}, δ = {:s}°, err = {:s}".format(ampl_str, delta_str, err_str))
+        msg = "A = {:s}, δ = {:s}°".format(ampl_str, delta_str)
+        if fit_model == 'c6v':
+            msg += ", R = {:s}".format(zzz_str)
+        msg += ", err = {:s}".format(err_str)
+        print(msg)
     else:
-        print('.', end='')
+        print('.', end='', flush=True)
 
     return err
 
 
-def fit_pipo(pipo_arr=None, file_name=None, fit_model='zcq', plot_progress=False):
+def fit_pipo(
+        pipo_arr=None, file_name=None, fit_model='zcq', plot_progress=False,
+        **kwargs):
+
     if pipo_arr is None:
         pipo_arr = load_pipo(file_name)
 
-    guess_par = [np.max(pipo_arr), 0]
+    if fit_model not in ['zcq', 'c6v']:
+        raise Exception("Unsupported fittig model")
 
-    fit_cfg = {
-        'fit_model': fit_model,
-        'plot_progress': plot_progress
-    }
-
-    plot_progress = fit_cfg.get('plot_progress', False)
+    if fit_model == 'zcq':
+        guess_par = [np.max(pipo_arr), 0]
+    elif fit_model == 'c6v':
+        guess_par = [np.max(pipo_arr), 0, 1.5]
 
     if plot_progress:
         plt.figure(figsize=[12, 5])
 
+    tstart = time.time()
+
+    fit_cfg = {
+        'fit_model': fit_model,
+        'plot_progress': plot_progress,
+    }
+
+    print("Fitting data", end='')
+
+
     print("Fitting data", end='')
     fit_result = least_squares(pipo_fitfun, guess_par, args=(0, pipo_arr), kwargs=fit_cfg)
     print("Done")
+    num_eval = fit_result.nfev + fit_result.njev
+    print("Number of fit evaluations: {:d}".format(num_eval))
+    print("Fitting time: {:.2f} s".format(time.time() - tstart))
 
     if plot_progress:
         plt.close()
 
-    plot_pipo_fit(pipo_arr, fit_par=fit_result.x, show_fig=True, export_fig=True, **fit_cfg)
+    print_fit_par(fit_model=fit_model, fit_result=fit_result)
 
-    print_fit_par(fit_model='zcq', fit_result=fit_result)
+    plot_pipo_fit(pipo_arr, fit_par=fit_result.x, **fit_cfg, **kwargs)
