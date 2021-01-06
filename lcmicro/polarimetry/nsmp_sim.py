@@ -81,7 +81,13 @@ def simulate_pipo(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
             # Intensity at detector
             det_s0[ind_psa, ind_psg] = svec_out[0]
 
-    return round_to(det_s0, trunc_thr)
+    # Scale to max 1
+    det_s0 = det_s0/np.max(det_s0)
+
+    # Round values
+    det_s0 = round_to(det_s0, trunc_thr)
+
+    return det_s0
 
 
 def make_pipo_animation_delta(
