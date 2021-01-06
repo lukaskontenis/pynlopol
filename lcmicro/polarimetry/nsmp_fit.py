@@ -207,6 +207,7 @@ def fit_pipo(
     tstart = time.time()
 
     fit_accel = None
+    diff_step = None
     if use_fit_accel:
         delta_min = 0/180*np.pi
         delta_max = 180/180*np.pi
@@ -241,7 +242,6 @@ def fit_pipo(
         fit_accel['mapinds'] = mapinds
         fit_accel['maps'] = maps
 
-        diff_step = None
         if fit_model == 'zcq':
             diff_step = [0.1, 2*delta_step]
         elif fit_model == 'c6v':
