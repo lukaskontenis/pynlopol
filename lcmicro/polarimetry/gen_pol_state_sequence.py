@@ -90,7 +90,7 @@ def gen_pol_state_sequence(
         elif input_state == 'hlp':
             #                   HLP  VLP   +45    -45  RCP  LCP   -22.5    REP    LEP
             psg_hwp = np.array([  0,  45, 22.5, -22.5,   0,   0, -11.25, 33.75, 33.75]) / 180*np.pi
-            psg_qwp = np.array([  0,  90,   45,  -45,   45,  45,  -22.5,    90,    45]) / 180*np.pi
+            psg_qwp = np.array([  0,  90,   45,  -45,   45,  -45,  -22.5,    90,    45]) / 180*np.pi
 
     # == Generate PSA states ==
 
