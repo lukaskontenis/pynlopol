@@ -25,7 +25,7 @@ from lcmicro.polarimetry.nsmp_common import get_nsmp_state_order, \
 def gen_pol_state_sequence(
         pset_name='shg_nsmp', scan_order='psa_first', input_state='hlp',
         output_state='hlp', with_ref_states=True, ref_state='hlp',
-        write_files=False, verbosity=0):
+        write_files=False, verbosity=0, **kwargs):
     """Create a polarization state sequence for PIPO or NSMP.
 
     Args:
@@ -37,6 +37,16 @@ def gen_pol_state_sequence(
         ref_state - State to use as reference
         write_files - Write the state sequence to PolStates.dat
     """
+    # Verbosity level
+    vlvl = kwargs.get('vlvl', 2)
+
+    if vlvl >= 2:
+        print("Generating polarization state sequence...")
+        print("Seqeunce name: {:s}".format(pset_name))
+        print("Input state: {:s}".format(input_state))
+        print("Output state: {:s}".format(output_state))
+        print("Reference states: {:b}".format(with_ref_states))
+
     validate_pset_name(pset_name)
     valid_scan_oders = {'psa_first', 'psg_first'}
 
@@ -78,7 +88,7 @@ def gen_pol_state_sequence(
     elif pset_name == 'shg_nsmp':
         # Nonlinear Stokes-Mueller polarimetry state set for the SHG case
         # 54 states, 9 psg x 6 psa
-        psg_states = get_nsmp_state_order('shg')[0]
+        psg_states = get_nsmp_state_order(pset_name)[0]
         if psg_states != ['hlp', 'vlp', '+45', '-45', 'rcp', 'lcp', '-22.5', 'rep', 'lep']:
             raise(Exception("Invalid SHG NSMP PSG state order"))
 
@@ -93,7 +103,6 @@ def gen_pol_state_sequence(
             psg_qwp = np.array([  0,  90,   45,  -45,   45,  -45,  -22.5,    90,    45]) / 180*np.pi
 
     # == Generate PSA states ==
-
     if pset_name[0:4] == 'pipo':
         # PIPO PSG and PSA states are generated earlier together
         pass
@@ -101,7 +110,7 @@ def gen_pol_state_sequence(
     elif pset_name == 'shg_nsmp':
         # Nonlinear Stokes-Mueller polarimetry state set for the SHG case
         # 54 states, 9 psg x 6 psa
-        psa_states = get_nsmp_state_order('shg')[0]
+        psa_states = get_nsmp_state_order('shg_nsmp')[1]
         if psa_states != ['hlp', 'vlp', '+45', '-45', 'rcp', 'lcp']:
             raise(Exception("Invalid SHG NSMP PSA state order"))
 
@@ -121,7 +130,7 @@ def gen_pol_state_sequence(
 
     # === Verify states ===
 
-    # For the PSG to work correctly it has to transofrm the input state to the
+    # For the PSG to work correctly it has to transform the input state to the
     # given PSG state at the PSG output
     svec_in = get_stokes_vec(input_state)
 
@@ -131,7 +140,7 @@ def gen_pol_state_sequence(
         svec_psg = mmat_qwp.dot(mmat_hwp.dot(svec_in))
 
         if not tensor_eq(svec_psg, get_stokes_vec(psg_states[ind_psg])):
-            print("PSG state {:d} is not {:s}", ind_psg, psg_states[ind_psg])
+            print("PSG state {:d} is not {:s}".format(ind_psg, psg_states[ind_psg]))
 
     # For the PSA to work correctly it has to transform all the given states
     # arriving at the PSA into the detector output states after the PSA
