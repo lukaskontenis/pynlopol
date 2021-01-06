@@ -56,11 +56,12 @@ def rot_mueller_mat(mat, theta=0):
 
 
 def get_mueller_mat(element, theta=0, **kwargs):
-    """Get the Mueller matrix of ``element``.
+    """Get the Mueller matrix of ``element`` with rotation.
 
-    The element can be rotated by angle ``theta``. The ``PolD`` diattenuating
-    polarizer transmission coefficients are specified by the ``q`` and ``r``
-    kwargs.
+    Rotation is given by theta.
+
+    Transmission coefficients for diattenuating polarizer ('PolD') are
+    specified using q and r kwargs.
     """
     mat = zeros([4, 4])
 
@@ -155,6 +156,25 @@ def get_stokes_vec(state):
 
     svec.shape = (4, 1)
     return svec
+
+
+def get_psgpsa_vector(angles, input_state='hlp'):
+    """Get Stokes vector after a PSG/PSA.
+
+    Propagate an input Stokes vector through a HWP followed by a QWP rotated by
+    the angles given.
+
+    Args:
+        angles (arr) - hwp, qwp angles in rad
+        input_state (str) - input state before the PSG/PSA
+
+    Returns:
+        Output Stokes vector
+    """
+    svec_in = get_stokes_vec(input_state)
+    mmat_hwp = get_mueller_mat('hwp', angles[0])
+    mmat_qwp = get_mueller_mat('qwp', angles[1])
+    return mmat_qwp.dot(mmat_hwp.dot(svec_in))
 
 
 def get_waveplate_thickness(
