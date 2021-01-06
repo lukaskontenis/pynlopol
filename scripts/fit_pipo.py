@@ -17,6 +17,7 @@ import os
 from lklib.fileread import list_files_with_extension
 from lklib.util import handle_general_exception
 
+from lcmicro.dataio import get_microscopy_data_file_name
 from lcmicro.polarimetry.nsmp_fit import fit_pipo
 
 
@@ -25,12 +26,7 @@ print("=== PIPO fitter ===")
 file_name = None
 num_args = len(sys.argv)
 if num_args < 2:
-    file_names = list_files_with_extension(ext='dat')
-    if len(file_names) == 1:
-        file_name = file_names[0]
-        print("Found a single dat file '{:s}s', loading it".format(file_name))
-    else:
-        print("More than one dat file found, specify which to load using:")
+    file_name = get_microscopy_data_file_name()
 else:
     file_name = sys.argv[1]
 
