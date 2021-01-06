@@ -196,6 +196,9 @@ def fit_pipo(
     if fit_model not in ['zcq', 'c6v']:
         raise Exception("Unsupported fittig model")
 
+    if use_fit_accel and fit_model != 'c6v':
+        raise Exception("Fit acceleration only supported for c6v")
+
     if fit_model == 'zcq':
         guess_par = [np.max(pipo_arr), 0]
     elif fit_model == 'c6v':
