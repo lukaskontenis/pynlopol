@@ -121,7 +121,7 @@ def print_fit_par(fit_model=None, fit_result=None):
     print('\tA = {:s}'.format(ampl_str))
     print('\tδ = {:s}°'.format(delta_str))
     if zzz is not None:
-        print('\tzzz = {:s}°'.format(zzz_str))
+        print('\tzzz = {:s}'.format(zzz_str))
     print('RMS residual error: {:s}\n'.format(err_str))
 
 
@@ -199,10 +199,17 @@ def fit_pipo(
     if use_fit_accel and fit_model != 'c6v':
         raise Exception("Fit acceleration only supported for c6v")
 
+    max_ampl = np.max(pipo_arr)
     if fit_model == 'zcq':
-        guess_par = [np.max(pipo_arr), 0]
+        guess_par = [max_ampl, 0]
+        bounds = [
+            [0,             0]
+            [max_ampl*1.5,  np.pi]]
     elif fit_model == 'c6v':
-        guess_par = [np.max(pipo_arr), 0, 1.5]
+        guess_par = [max_ampl, 0, 1.5]
+        bounds = [
+            [0,             0,      0.1]
+            [max_ampl*1.5,  np.pi,  10]]
 
     if plot_progress:
         plt.figure(figsize=[12, 5])
@@ -245,10 +252,7 @@ def fit_pipo(
         fit_accel['mapinds'] = mapinds
         fit_accel['maps'] = maps
 
-        if fit_model == 'zcq':
-            diff_step = [0.1, 2*delta_step]
-        elif fit_model == 'c6v':
-            diff_step = [0.1, 2*delta_step, zzz_step]
+
 
     fit_cfg = {
         'fit_model': fit_model,
@@ -259,7 +263,7 @@ def fit_pipo(
 
     print("Fitting data", end='')
 
-    fit_result = least_squares(pipo_fitfun, guess_par, args=(0, pipo_arr), diff_step=diff_step, kwargs=fit_cfg)
+    fit_result = least_squares(pipo_fitfun, guess_par, args=(0, pipo_arr), diff_step=diff_step, bounds=bounds, kwargs=fit_cfg)
 
     print("Done")
     num_eval = fit_result.nfev + fit_result.njev
