@@ -196,8 +196,8 @@ def gen_pol_state_sequence(
         seq = np.ndarray([num_states, 6])
 
         ind_seq = 0
-        for ind_psg in range(num_psa):
-            for ind_psa in range(num_psg):
+        for ind_psg in range(num_psg):
+            for ind_psa in range(num_psa):
                 seq[ind_seq, 0] = ind_psg
                 seq[ind_seq, 1] = ind_psa
                 seq[ind_seq, 2] = psg_hwp[ind_psg]/np.pi*180
