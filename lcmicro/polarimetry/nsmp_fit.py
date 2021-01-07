@@ -22,12 +22,6 @@ from lcmicro.proc import load_pipo
 from lcmicro.polarimetry.nsmp_sim import simulate_pipo
 from lcmicro.polarimetry.report import plot_pipo
 
-def unwrap_angle(angle, period=np.pi, plus_minus_range=True):
-    """Unwrap angle to value to [-period/2, period/2] range."""
-    if plus_minus_range:
-        return angle - np.round(angle/period)*period
-    else:
-        return angle - np.floor(angle/period)*period
 
 
 def plot_pipo_fit(
