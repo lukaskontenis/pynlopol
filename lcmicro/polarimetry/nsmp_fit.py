@@ -19,70 +19,11 @@ from lklib.plot import export_figure
 from lklib.string import get_human_val_str, arr_summary_str
 
 from lcmicro.proc import load_pipo
+from lcmicro.polarimetry.report import plot_pipo_fit_img, plot_pipo_fit_1point
 from lcmicro.polarimetry.nsmp_sim import simulate_pipo
-from lcmicro.polarimetry.report import plot_pipo
-
-
-
-def plot_pipo_fit(
-        data, fit_model=None, fit_par=None, fit_data=None,
-        show_fig=False, new_fig=True,
-        export_fig=False, fig_file_name=None, **kwargs):
-    if fit_model not in ['zcq', 'c6v']:
-        raise(Exception("Unsupported fitting model"))
-    if fit_par is None:
-        raise(Exception("No fit parameters given"))
-    if (fit_model == 'zcq' and len(fit_par) != 2) or \
-        (fit_model == 'c6v' and len(fit_par) != 3):
-        raise(Exception("Incorrect number of fit parameters"))
-
-    zzz = None
-    if fit_model == 'zcq':
-        ampl = fit_par[0]
-        delta = fit_par[1]
-        delta_period = 60/180*np.pi
-        symmetry_str = 'd3'
-    elif fit_model == 'c6v':
-        ampl = fit_par[0]
-        delta = fit_par[1]
-        zzz = fit_par[2]
-        delta_period = 180/180*np.pi
-        symmetry_str = 'c6v'
-
-    if fit_data is None:
-        fit_data = ampl*simulate_pipo(symmetry_str=symmetry_str, delta=delta, zzz=zzz)
-
-    res = data - fit_data
-    err = np.mean(np.sqrt(res**2))
-
-    ampl_str = get_human_val_str(ampl, suppress_suffix='m')
-    zzz_str = get_human_val_str(zzz, num_sig_fig=3, suppress_suffix='m')
-    delta_str = get_human_val_str(unwrap_angle(delta, period=delta_period)/np.pi*180, num_sig_fig=3, suppress_suffix='m')
-    err_str = get_human_val_str(err)
-
-    if new_fig:
-        plt.figure(figsize=[12, 5])
-    else:
-        plt.clf()
 from lcmicro.polarimetry.fitdata import get_parmap
 
-    plt.subplot(1, 3, 1)
-    plt.imshow(data, cmap='gray')
-    plt.title('Data')
-    plt.subplot(1, 3, 2)
-    plt.imshow(fit_data, cmap='gray')
-    if fit_model == 'zcq':
-        plt.title('Fit model ''{:s}''\nA = {:s}, δ = {:s}°'.format(fit_model, ampl_str, delta_str))
-    else:
-        plt.title('Fit model ''{:s}''\nA = {:s}, R = {:s}, δ = {:s}°'.format(fit_model, ampl_str, zzz_str, delta_str))
-    plt.subplot(1, 3, 3)
-    plt.imshow(res, cmap='coolwarm')
-    plt.title('Residuals, err = {:s}'.format(err_str))
 
-    if export_fig:
-        print("Exporting figure...")
-        if fig_file_name is None:
-            fig_file_name = 'pipo_fit.png'
 
         export_figure(fig_file_name, resize=False)
 
