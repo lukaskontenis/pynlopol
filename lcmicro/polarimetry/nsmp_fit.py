@@ -16,7 +16,7 @@ from scipy.interpolate import interpn
 import time
 
 from lklib.plot import export_figure
-from lklib.string import get_human_val_str
+from lklib.string import get_human_val_str, arr_summary_str
 
 from lcmicro.proc import load_pipo
 from lcmicro.polarimetry.nsmp_sim import simulate_pipo
@@ -64,6 +64,7 @@ def plot_pipo_fit(
         plt.figure(figsize=[12, 5])
     else:
         plt.clf()
+from lcmicro.polarimetry.fitdata import get_parmap
 
     plt.subplot(1, 3, 1)
     plt.imshow(data, cmap='gray')
@@ -117,6 +118,52 @@ def print_fit_par(fit_model=None, fit_result=None):
     if zzz is not None:
         print('\tzzz = {:s}'.format(zzz_str))
     print('RMS residual error: {:s}\n'.format(err_str))
+
+
+def print_fit_result_img(fitdata):
+    """Print PIPO fit results for an image."""
+    print("=== Fit results ===")
+
+    data_type = fitdata['data_type']
+    print("Data type: " + data_type)
+
+    fit_model = fitdata['model']
+
+    fit_mask = fitdata['mask']
+    num_row, num_col = np.shape(fit_mask)
+    num_px = num_row*num_col
+    num_pts_to_fit = fitdata['num_pts_to_fit']
+    if data_type == 'img':
+        print("Image size: {:d}x{:d}".format(num_row, num_col))
+        print("Fit threshold: {:d} c.".format(fitdata['mask_thr']))
+        num_thr = np.sum(fit_mask)
+        print("Number of px. above threshold: {:d}, {:.0f}%".format(
+            num_thr, num_thr/num_px*100))
+
+        if num_pts_to_fit < num_thr:
+            print("Number of px. fitted: {:d}, {:.0f}%".format(
+                num_pts_to_fit, num_pts_to_fit/num_px*100))
+
+    zzz = None
+    if fit_model in ['zcq', 'c6v']:
+        ampl = get_parmap(fitdata, 'x', 0)
+        delta = get_parmap(fitdata, 'x', 1)
+
+    if fit_model == 'c6v':
+        zzz = get_parmap(fitdata, 'x', 2)
+
+    err = get_parmap(fitdata, 'err', 0)
+
+    print('Fit model: {:s}'.format(fit_model))
+    print('Parameters:')
+    print('\tA: ' + arr_summary_str(ampl, suppress_suffix='m'))
+    print('\tδ (°): ' + arr_summary_str(delta/np.pi*180, num_sig_fig=3))
+    if zzz is not None:
+        print('\tzzz: ' + arr_summary_str(
+            ampl, num_sig_fig=3, suppress_suffix='m'))
+
+    print('RMS residual error: ' + arr_summary_str(err))
+    print('\n')
 
 
 def pipo_fitfun(
