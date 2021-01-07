@@ -118,7 +118,7 @@ def get_stokes_vec(state):
 
     try:
         lp_angle = float(state)
-    except Exception:
+    except ValueError:
         lp_angle = None
 
     if lp_angle is not None:
