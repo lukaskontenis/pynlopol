@@ -24,7 +24,7 @@ from lcmicro.polarimetry.gen_pol_state_sequence import gen_pol_state_sequence
 from lcmicro.polarimetry.nsmp import get_nsm_matrix
 from lcmicro.polarimetry.nsmp_common import get_nsvec
 from lcmicro.polarimetry.polarimetry import get_stokes_vec, get_mueller_mat
-from lcmicro.polarimetry.report import plot_pipo
+from lcmicro.polarimetry.plot import plot_pipo
 
 
 def simulate_pipo(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
@@ -91,7 +91,7 @@ def simulate_pipo(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
 
 
 def make_pipo_animation_delta(
-    sample='zcq', num_steps=9, fps=3, pset_name='pipo_100x100'):
+        sample='zcq', num_steps=9, fps=3, pset_name='pipo_100x100'):
     """Make PIPO map GIF of a sample by varying delta.
 
     Args:
@@ -125,14 +125,18 @@ def make_pipo_animation_delta(
             pset_name=pset_name)
 
         plot_pipo(pipo_data, show_fig=False, pset_name=pset_name)
-        plt.title(title_str + " PIPO map, delta={:.1f} deg".format(delta*180/np.pi))
+
+        plt.title(
+            title_str + " PIPO map, delta={:.1f} deg".format(delta*180/np.pi))
+
         print("Exporting frame {:d}".format(ind))
         file_name = 'frame_{:d}.png'.format(ind)
         file_names.append(file_name)
         export_figure(file_name, resize=False)
 
     print("Exporting GIF...")
-    make_gif(output_name=sample + '_delta_pipo.gif', file_names=file_names, fps=fps)
+    make_gif(
+        output_name=sample + '_delta_pipo.gif', file_names=file_names, fps=fps)
 
     print("Removing frame files...")
     for file_name in file_names:
@@ -142,7 +146,8 @@ def make_pipo_animation_delta(
 
 
 def make_pipo_animation_zzz(
-        sample='collagen', num_steps=20, fps=3, pset_name='pipo_100x100', **kwargs):
+        sample='collagen', num_steps=20, fps=3, pset_name='pipo_100x100',
+        **kwargs):
     """Make PIPO map GIF of a sample by varying zzz.
 
     Args:
@@ -154,7 +159,8 @@ def make_pipo_animation_zzz(
     delta = kwargs.get('delta', 0)
     symmetry_str = 'c6v'
 
-    print("Making PIPO map animation for collagen with delta={:.1f}".format(delta) + " and varying zzz")
+    print("Making PIPO map animation for collagen with delta={:.1f} and "
+          "varying zzz".format(delta))
 
     file_names = []
     for ind, zzz in enumerate(zzz_arr):
@@ -166,14 +172,16 @@ def make_pipo_animation_zzz(
 
         plot_pipo(pipo_data, show_fig=False, pset_name=pset_name)
 
-        plt.title("Collagen R={:.2f}".format(zzz) + " PIPO map, delta={:.1f} deg".format(delta*180/np.pi))
+        plt.title("Collagen R={:.2f} PIPO map, delta={:.1f} deg".format(
+            zzz, delta*180/np.pi))
         print("Exporting frame {:d}".format(ind))
         file_name = 'frame_{:d}.png'.format(ind)
         file_names.append(file_name)
         export_figure(file_name, resize=False)
 
     print("Exporting GIF...")
-    make_gif(output_name=sample + '_zzz_pipo.gif', file_names=file_names, fps=fps)
+    make_gif(
+        output_name=sample + '_zzz_pipo.gif', file_names=file_names, fps=fps)
 
     print("Removing frame files...")
     for file_name in file_names:
