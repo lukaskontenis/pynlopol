@@ -1,6 +1,6 @@
 """Fit a model to a PIPO map.
 
-Fit a 'zcq' nonlinear SHG tensor model to a PIPO dataset.
+Fit a nonlinear tensor model to a PIPO dataset.
 
 This script is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
@@ -20,6 +20,9 @@ from lklib.util import handle_general_exception
 from lcmicro.dataio import get_microscopy_data_file_name
 from lcmicro.polarimetry.nsmp_fit import fit_pipo
 
+# Image area to crop before fitting:
+#   [from_row, to_row, from_col, to_col], in pixels
+cropsz = [46, 87, 135, 152]
 
 print("=== PIPO fitter ===")
 
@@ -36,11 +39,15 @@ if file_name is None:
     print("\nOr drag a dat file on the script icon.\n")
 else:
     try:
-        fit_model='zcq'
+        fit_model='c6v'
         print("Fitting '{:s}' model to dataset '{:s}'".format(fit_model, file_name))
-        fit_pipo(file_name=file_name, fit_model=fit_model, plot_progress=False)
+
+        fit_pipo(
+            file_name=file_name, fit_model=fit_model, use_fit_accel=True,
+            binsz=None, cropsz=cropsz, max_fit_pts=None,
+            show_input=True, show_fig=True, plot_progress=False)
 
     except Exception:
-        handle_general_exception("Figure generation failed")
+        handle_general_exception("Fitting failed")
 
 input("Pess any key to close this window...")
