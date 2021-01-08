@@ -52,7 +52,7 @@ def plot_pipo(
                    psa_states[0], psa_states[-1]]]
 
     # Plot PIPO map
-    plt.imshow(data, origin='lower', cmap='gray', extent=extent)
+    plt.imshow(data, origin='lower', cmap='plasma', extent=extent)
 
     # Add state labels
     plt.gca()
