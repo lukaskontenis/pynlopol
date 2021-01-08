@@ -1,7 +1,8 @@
-"""Generate an SHG PIPO map.
+"""Simulate a PIPO dataset.
 
-Generate an SHG PIPO map for the given sample. In-plane angle (delta) and zzz
-zzz ratio input parameters are supported.
+Simulate a PIPO map for a given nonlinear susceptibility tensor symmetry and
+sample parameters. Currently, SHG c6v (for collagen) and D3 (for z-cut quartz)
+tensors are supported with zzz/zxx and in-plane angle (delta) parameters.
 
 Args:
     sample_name – 'zcq' for z-cut quartz and 'collagen'
@@ -17,10 +18,11 @@ Contact: dse.ssd@gmail.com
 # flake8: noqa
 # pylint: skip-file
 
-sample_name = 'zcq'
-delta = 15
+sample_name = 'collagen'
+delta = 0/180*3.14
 zzz = 1.5
 pset_name = 'pipo_8x8'
+output_type = 'img'  # '1point' or 'img'
 
 try:
     print("=== lcmicro ===")
@@ -28,10 +30,13 @@ try:
 
     import sys
     import matplotlib.pyplot as plt
+    import numpy as np
 
-    from lklib.plot import export_figure
-    from lcmicro.polarimetry import simulate_pipo, plot_pipo
     from lklib.util import handle_general_exception
+    from lklib.plot import export_figure
+
+    from lcmicro.polarimetry import simulate_pipo, plot_pipo
+    from lcmicro.proc import convert_pipo_to_tiff
 
     num_args = len(sys.argv)
     if num_args < 2:
@@ -95,20 +100,31 @@ try:
 
     print("Generating map...")
 
-    pipo_data = simulate_pipo(symmetry_str=symmetry_str, delta=delta/180*3.14, zzz=zzz, pset_name=pset_name)
+    pipo_data = simulate_pipo(
+        symmetry_str=symmetry_str, delta=delta, zzz=zzz,
+        pset_name=pset_name, output_type=output_type)
 
     if sample_name == 'collagen':
-        title_str = "Collagen R={:.2f}".format(zzz) + " PIPO map, δ={:.0f}°".format(delta)
+        title_str = "Collagen R={:.2f}".format(zzz) + " PIPO map, δ={:.0f}°".format(delta/3.14*180)
     elif sample_name == 'zcq':
-        title_str = "Z-cut quartz PIPO map, δ={:.0f}°".format(delta)
+        title_str = "Z-cut quartz PIPO map, δ={:.0f}°".format(delta/3.14*180)
 
-    plot_pipo(pipo_data, title_str=title_str, show_fig=False, pset_name=pset_name)
+    if len(np.shape(pipo_data)) == 2:
+        plot_pipo(pipo_data, title_str=title_str, show_fig=False, pset_name=pset_name)
 
-    print("Exporting 'pipo_map.png'...")
-    export_figure('pipo_map.png', resize=False)
+        print("Exporting 'pipo_map.png'...")
+        export_figure('pipo_map.png', resize=False)
 
-    print("Showing figure...")
-    plt.show()
+        print("Showing figure...")
+        plt.show()
+
+    if len(np.shape(pipo_data)) == 4:
+        pipo_data = (pipo_data*1000).astype('uint16')
+        print("Exporting PIPO dataset as a multipage TIFF file...")
+        convert_pipo_to_tiff(
+            pipo_arr=pipo_data, file_name=sample_name + 'pipo_sim',
+            duplicate_first_and_last_state=True,
+            add_dummy_ref_states=True)
 
 except Exception:
     handle_general_exception("Could not simulate PIPO")
