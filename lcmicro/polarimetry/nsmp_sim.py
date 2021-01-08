@@ -27,7 +27,7 @@ from lcmicro.polarimetry.polarimetry import get_stokes_vec, get_mueller_mat
 from lcmicro.polarimetry.plot import plot_pipo
 
 
-def simulate_pipo(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
+def simulate_pipo_1point(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
     """Simulate SHG PIPO response of a sample.
 
     The code currenlty works for a pipo_8x8 state set only. Input and output
@@ -88,6 +88,29 @@ def simulate_pipo(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
     det_s0 = round_to(det_s0, trunc_thr)
 
     return det_s0
+
+
+def simulate_pipo_img(img_sz=[128, 128], **kwargs):
+    pipo_arr1 = simulate_pipo_1point(**kwargs)
+    num_psg, num_psa = np.shape(pipo_arr1)
+
+    pipo_arr = np.ndarray([img_sz[0], img_sz[1], num_psg, num_psa])
+
+    for ind_row in range(img_sz[0]):
+        for ind_col in range(img_sz[1]):
+            pipo_arr[ind_row, ind_col, :, :] = pipo_arr1
+
+    return pipo_arr
+
+
+def simulate_pipo(output_type='1point', **kwargs):
+    if output_type == '1point':
+        return simulate_pipo_1point(**kwargs)
+    elif output_type == 'img':
+        return simulate_pipo_img(**kwargs)
+    else:
+        print("Unsupported output type '{:s}'".format(output_type))
+        return None
 
 
 def make_pipo_animation_delta(
