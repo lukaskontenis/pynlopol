@@ -11,6 +11,7 @@ Contact: dse.ssd@gmail.com
 """
 # flake8: noqa
 
+from lcmicro.polarimetry.dataio import *
 from lcmicro.polarimetry.polarimetry import *
 from lcmicro.polarimetry.nsmp_common import *
 from lcmicro.polarimetry.nsmp import *
