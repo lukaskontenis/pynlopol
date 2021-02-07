@@ -112,7 +112,7 @@ def get_mueller_mat(element, theta=0, **kwargs):
     return mat
 
 
-def get_stokes_vec(state):
+def get_stokes_vec(state, gamma=0, omega=0):
     """Get the Stokes vector of ``state``."""
     svec = zeros([4, 1])
 
@@ -146,6 +146,9 @@ def get_stokes_vec(state):
         elif state == 'lep':
             gamma = pi/4
             omega = -pi/8
+        elif state == 'custom':
+            gamma = gamma
+            omega = omega
         else:
             print('State ''{:s}'' not defined'.format(state))
 
