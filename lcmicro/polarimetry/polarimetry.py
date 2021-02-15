@@ -98,6 +98,19 @@ def get_mueller_mat(element, theta=0, **kwargs):
         mat[1, 1] = 1
         mat = mat*0.5
 
+    elif element in ("dattn", "real_pol", "real polarizer"):
+        qtrans = kwargs.get('qtrans', 1)
+        rtrans = kwargs.get('rtrans', 0)
+
+        mat[0, 0] = qtrans + rtrans
+        mat[1, 0] = qtrans - rtrans
+        mat[0, 1] = qtrans - rtrans
+        mat[1, 1] = qtrans + rtrans
+        mat[2, 2] = 2*np.sqrt(qtrans*rtrans)
+        mat[3, 3] = 2*np.sqrt(qtrans*rtrans)
+
+        mat = mat*0.5
+
     elif element in ("unity", "empty", "nop"):
         mat[0, 0] = 1
         mat[1, 1] = 1
