@@ -156,7 +156,6 @@ def plot_pipo_fit_1point(
     plt.subplot(1, 3, 3)
     plt.imshow(res, cmap='coolwarm')
 
-
     frac_err = err/total_cnt
     frac_err_str = "{:.2f}%".format(frac_err*100)
     plt.title('Residuals, rmse = {:s}'.format(err_str) + ', ' + frac_err_str)
