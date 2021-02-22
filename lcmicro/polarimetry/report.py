@@ -142,7 +142,9 @@ def plot_pipo_fit_1point(
 
     plt.subplot(1, 3, 1)
     plt.imshow(data, cmap='gray')
-    plt.title('Data')
+    total_cnt = data.sum()
+    total_cnt_str = get_human_val_str(total_cnt)
+    plt.title('Data, ' + total_cnt_str)
     plt.subplot(1, 3, 2)
     plt.imshow(fit_data, cmap='gray')
     if fit_model == 'zcq':
