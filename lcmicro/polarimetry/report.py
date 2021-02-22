@@ -126,7 +126,7 @@ def plot_pipo_fit_1point(
             symmetry_str=symmetry_str, delta=delta, zzz=zzz)
 
     res = data - fit_data
-    err = np.mean(np.sqrt(res**2))
+    err = np.sqrt(np.mean(res**2))
 
     ampl_str = get_human_val_str(ampl, suppress_suffix='m')
     zzz_str = get_human_val_str(zzz, num_sig_fig=3, suppress_suffix='m')
