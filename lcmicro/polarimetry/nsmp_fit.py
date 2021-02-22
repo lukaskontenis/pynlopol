@@ -239,7 +239,7 @@ def fit_pipo_1point(
     if fit_model == 'zcq':
         guess_par = [max_ampl, 0]
         bounds = [
-            [0,             0],
+            [0,             -np.pi],
             [max_ampl*1.5,  np.pi]]
     elif fit_model == 'c6v':
         guess_par = [max_ampl, 0, 1.5]
