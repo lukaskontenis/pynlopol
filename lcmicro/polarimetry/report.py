@@ -155,7 +155,11 @@ def plot_pipo_fit_1point(
             fit_model, ampl_str, zzz_str, delta_str))
     plt.subplot(1, 3, 3)
     plt.imshow(res, cmap='coolwarm')
-    plt.title('Residuals, err = {:s}'.format(err_str))
+
+
+    frac_err = err/total_cnt
+    frac_err_str = "{:.2f}%".format(frac_err*100)
+    plt.title('Residuals, rmse = {:s}'.format(err_str) + ', ' + frac_err_str)
 
     if export_fig:
         print("Exporting figure...")
