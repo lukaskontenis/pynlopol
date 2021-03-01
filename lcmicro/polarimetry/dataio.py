@@ -53,10 +53,23 @@ def load_nsmp(file_name=None, chan_ind=None, binsz=None, cropsz=None):
     num_chan = 4
     num_img = int(data.shape[2]/num_chan)
 
+    if num_img == 55:
+        print("BUG: 55 polarization states detected, truncating to 54")
+        data = data[:, :, :-4]
+        num_img = 54
+
     if num_img == 54:
         pset_name = 'shg_nsmp'
+    elif num_img == 55:
+        print("Dataset contains 55 states which is one too many for an SHG "
+              "NSMP set. Discarding the extra state and assuming the data is "
+              "SHG NSMP.")
+        data = data[:, :, :-4]
+        num_img = 54
     else:
-        print("Polarization state set cannot be guessed from the number of images ({:d})in the dataset.".format(num_img))
+        print("Polarization state set cannot be guessed from the number of "
+              "images ({:d})in the dataset.".format(num_img))
+        return None
 
     num_psg_states, num_psa_states = get_num_states(pset_name)
     if binsz == 'all':
