@@ -13,10 +13,11 @@ from lklib.fileread import list_files_with_extension, read_bin_file
 
 from lcmicro.cfgparse import read_cfg, parse_chan_idx
 
-from lcmicro.polarimetry.nsmp_common import get_nsmp_state_order, get_num_states
+from lcmicro.polarimetry.nsmp_common import get_num_states
 
 
 def get_microscopy_data_file_name(file_name=None):
+    """Automatically get data file name in the current dir."""
     file_names = list_files_with_extension(ext='dat')
 
     # Remove PolStates.dat files
@@ -79,7 +80,8 @@ def load_nsmp(file_name=None, chan_ind=None, binsz=None, cropsz=None):
         if cropsz:
             num_row = cropsz[1] - cropsz[0]
             num_col = cropsz[3] - cropsz[2]
-        pipo_iarr = np.ndarray([num_row, num_col, num_psa_states, num_psg_states])
+        pipo_iarr = np.ndarray(
+            [num_row, num_col, num_psa_states, num_psg_states])
 
     if cropsz:
         print("Cropping image to " + str(cropsz) + " px")
