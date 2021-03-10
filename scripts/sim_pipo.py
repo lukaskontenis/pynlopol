@@ -19,7 +19,7 @@ Contact: dse.ssd@gmail.com
 # pylint: skip-file
 
 sample_name = 'collagen'
-delta = 0/180*3.14
+delta = 40/180*3.14
 zzz = 1.5
 pset_name = 'pipo_8x8'
 output_type = 'img'  # '1point' or 'img'
@@ -31,6 +31,7 @@ try:
     import sys
     import matplotlib.pyplot as plt
     import numpy as np
+    import imageio
 
     from lklib.util import handle_general_exception
     from lklib.plot import export_figure
@@ -119,11 +120,11 @@ try:
         plt.show()
 
     if len(np.shape(pipo_data)) == 4:
-        pipo_data = (pipo_data*1000).astype('uint16')
         print("Exporting PIPO dataset as a multipage TIFF file...")
         convert_pipo_to_tiff(
             pipo_arr=pipo_data, file_name=sample_name + 'pipo_sim',
             duplicate_first_and_last_state=True,
+            preset='piponator',
             add_dummy_ref_states=True)
 
 except Exception:

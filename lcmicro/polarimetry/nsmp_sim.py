@@ -15,6 +15,7 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
+import imageio
 
 from lklib.util import round_to
 from lklib.plot import export_figure
@@ -90,20 +91,73 @@ def simulate_pipo_1point(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
     return det_s0
 
 
-def simulate_pipo_img(img_sz=[128, 128], **kwargs):
+def simulate_pipo_img(
+        img_sz=[128, 128], dtype='float', max_ampl=100, img_type='ramp',
+        ref_img_name=None, with_poisson_noise=True, **kwargs):
+    """Simulate a PIPO dataset.
+
+    Simulate a PIPO dataset for a given tensor and sample parameters.
+    Currently, SHG c6v (for collagen, muscle and starch) and D3 (for z-cut
+    quartz) tensors are supported with R=zzz/zxx ratio and in-plane
+    angle (delta) parameters.
+
+    The symmetry_str, zzz and delta arguments are handled by
+    simulate_pipo_1point().
+
+    Args:
+        symetry_str – 'c6v' for collagen and 'd3' for z-cut quartz
+        zzz – R-ratio (zzz/zxx) in the collagen case
+        delta – sample in-plane orientation angle in degrees
+        img_sz - image size [rows, cols] in pixels
+        dtype - output data type, 'float' or 'uint16'
+        max_ampl - maximum amplitude
+        img_type - 'flat', 'ramp', 'ref_img'
+        ref_img_name - reference image name
+        with_poisson noise - sample pixel count values from a Poisson
+            distribution
+    """
     pipo_arr1 = simulate_pipo_1point(**kwargs)
-    num_psg, num_psa = np.shape(pipo_arr1)
+    num_psa, num_psg = np.shape(pipo_arr1)
+    num_row = img_sz[0]
+    num_col = img_sz[1]
 
-    pipo_arr = np.ndarray([img_sz[0], img_sz[1], num_psg, num_psa])
+    pipo_arr = np.ndarray([num_row, num_col, num_psa, num_psg])
 
-    for ind_row in range(img_sz[0]):
-        for ind_col in range(img_sz[1]):
+    for ind_row in range(num_row):
+        for ind_col in range(num_col):
             pipo_arr[ind_row, ind_col, :, :] = pipo_arr1
 
-    return pipo_arr
+    mask = np.ndarray([num_row, num_col])
+
+    if img_type == 'ramp':
+        mask_vec = np.linspace(1, max_ampl, num_col)
+        for indrow in range(num_row):
+            mask[indrow, :] = mask_vec
+
+        mask *= max_ampl
+
+    elif img_type == 'ref_img':
+        mask = imageio.imread(ref_img_name)
+
+    else:
+        mask.fill(max_ampl)
+
+    for indrow in range(num_row):
+        for indcol in range(num_col):
+            pipo_arr[indrow, indcol, :, :] = mask[indrow, indcol]*pipo_arr1
+
+    if with_poisson_noise:
+        pipo_arr = np.random.poisson(pipo_arr)
+
+    return pipo_arr.astype(dtype)
 
 
 def simulate_pipo(output_type='1point', **kwargs):
+    """Simulate a PIPO dataset.
+
+    Simulate a single-point PIPO dataset or a PIPO image. See the documentation
+    for simulate_pipo_1point or simuate_pipo_img for more details.
+    """
     if output_type == '1point':
         return simulate_pipo_1point(**kwargs)
     elif output_type == 'img':
