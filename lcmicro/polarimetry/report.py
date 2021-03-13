@@ -27,7 +27,8 @@ from lcmicro.polarimetry.fitdata import get_parmap
 def plot_pipo(
         data, title_str=None, round_to_thr=True, thr=1E-3,
         pset_name='pipo_8x8',
-        export_fig=False, fig_file_name=None, show_fig=True):
+        cmap='gray', tick_step=1, show_x_label=True, show_y_label=True,
+        export_fig=False, fig_file_name=None, show_fig=False):
     """Plot a PIPO map.
 
     Args:
@@ -57,15 +58,26 @@ def plot_pipo(
                    psa_states[0], psa_states[-1]]]
 
     # Plot PIPO map
-    plt.imshow(data, origin='lower', cmap='gray', extent=extent)
+    plt.imshow(data, origin='lower', cmap=cmap, extent=extent)
 
     # Add state labels
     plt.gca()
     if num_psg_states <= 10:
-        # Tick every state
-        plt.xticks(range(num_psg_states), psg_states)
+        # Tick every state, unless skip is set
+        if tick_step is not 1:
+            tick_vals = [psg_states[ind] for ind in np.arange(0, num_psg_states, tick_step)]
+        else:
+            tick_vals = psg_states
+
+        plt.xticks(np.arange(0, num_psg_states, tick_step), tick_vals)
+
     if num_psa_states <= 10:
-        plt.yticks(range(num_psa_states), psa_states)
+        if tick_step is not 1:
+            tick_vals = [psa_states[ind] for ind in np.arange(0, num_psa_states, tick_step)]
+        else:
+            tick_vals = psa_states
+
+        plt.yticks(np.arange(0, num_psa_states, tick_step), tick_vals)
     else:
         # Generate ticks automatically using 60-based 1, 2, 3, 6 step
         # multiples, e.g.:
@@ -78,8 +90,11 @@ def plot_pipo(
         plt.gca().xaxis.set_major_locator(MaxNLocator(steps=[1, 2, 3, 6]))
         plt.gca().yaxis.set_major_locator(MaxNLocator(steps=[1, 2, 3, 6]))
 
-    plt.xlabel('Input, deg')
-    plt.ylabel('Output, deg')
+    if show_x_label:
+        plt.xlabel('Input, deg')
+
+    if show_y_label:
+        plt.ylabel('Output, deg')
 
     if title_str is not None:
         plt.title(title_str)
@@ -100,11 +115,13 @@ def plot_pipo_fit_1point(
         show_fig=False, new_fig=True,
         export_fig=False, fig_file_name=None, **kwargs):
     """Plot PIPO fit result for a single point."""
-    if fit_model not in ['zcq', 'c6v']:
+    if fit_data is None and fit_model not in ['zcq', 'c6v']:
         raise Exception("Unsupported fitting model")
-    if fit_par is None:
+
+    if fit_data is None and fit_par is None:
         raise Exception("No fit parameters given")
-    if (fit_model == 'zcq' and len(fit_par) != 2) or \
+
+    if fit_model and (fit_model == 'zcq' and len(fit_par) != 2) or \
             (fit_model == 'c6v' and len(fit_par) != 3):
         raise Exception("Incorrect number of fit parameters")
 
@@ -127,13 +144,14 @@ def plot_pipo_fit_1point(
 
     res = data - fit_data
     err = np.sqrt(np.mean(res**2))
-
-    ampl_str = get_human_val_str(ampl, suppress_suffix='m')
-    zzz_str = get_human_val_str(zzz, num_sig_fig=3, suppress_suffix='m')
-    delta_str = get_human_val_str(
-        unwrap_angle(delta, period=delta_period)/np.pi*180,
-        num_sig_fig=3, suppress_suffix='m')
     err_str = get_human_val_str(err)
+
+    if fit_par is not None:
+        ampl_str = get_human_val_str(ampl, suppress_suffix='m')
+        zzz_str = get_human_val_str(zzz, num_sig_fig=3, suppress_suffix='m')
+        delta_str = get_human_val_str(
+            unwrap_angle(delta, period=delta_period)/np.pi*180,
+            num_sig_fig=3, suppress_suffix='m')
 
     if new_fig:
         plt.figure(figsize=[12, 5])
@@ -141,20 +159,20 @@ def plot_pipo_fit_1point(
         plt.clf()
 
     plt.subplot(1, 3, 1)
-    plt.imshow(data, cmap='gray')
+    plot_pipo(data, tick_step=2)
     total_cnt = data.sum()
     total_cnt_str = get_human_val_str(total_cnt)
-    plt.title('Data, ' + total_cnt_str)
+    plt.title('Data\nTotal counts: ' + total_cnt_str)
     plt.subplot(1, 3, 2)
-    plt.imshow(fit_data, cmap='gray')
+    plot_pipo(fit_data, tick_step=2, show_y_label=False)
     if fit_model == 'zcq':
         plt.title('Fit model ''{:s}''\nA = {:s}, δ = {:s}°'.format(
             fit_model, ampl_str, delta_str))
-    else:
+    elif fit_model == 'c6v':
         plt.title('Fit model ''{:s}''\nA = {:s}, R = {:s}, δ = {:s}°'.format(
             fit_model, ampl_str, zzz_str, delta_str))
     plt.subplot(1, 3, 3)
-    plt.imshow(res, cmap='coolwarm')
+    plot_pipo(res, cmap='coolwarm', round_to_thr=False, tick_step=2, show_y_label=False)
 
     frac_err = err/total_cnt
     frac_err_str = "{:.2f}%".format(frac_err*100)
@@ -201,12 +219,13 @@ def plot_pipo_fit_img(
 
     ax = plt.subplot(2, 2, 3)
     imshow_ex(
-        delta, ax=ax, logscale=False, cmap='hsv', title_str='delta (deg)',
+        delta, vmin=0, vmax=180, ax=ax, logscale=False, cmap='hsv', title_str='delta (deg)',
         with_hist=True, is_angle=True)
 
     ax = plt.subplot(2, 2, 4)
     imshow_ex(
         zzz, ax=ax, logscale=False, cmap='plasma', title_str='zzz',
+        min_vspan=0.2,
         with_hist=True)
 
     if export_fig:

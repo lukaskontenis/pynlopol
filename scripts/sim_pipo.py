@@ -18,11 +18,11 @@ Contact: dse.ssd@gmail.com
 # flake8: noqa
 # pylint: skip-file
 
-sample_name = 'collagen'
-delta = 40/180*3.14
+sample_name = 'zcq'
+delta = 0/180*3.14
 zzz = 1.5
 pset_name = 'pipo_8x8'
-output_type = 'img'  # '1point' or 'img'
+output_type = '1point'  # '1point' or 'img'
 
 try:
     print("=== lcmicro ===")

@@ -25,11 +25,12 @@ def get_parmap(fitdata, par_name='x', parind=0):
         for ind_col in range(num_col):
             if indpx == fitdata['num_pts_to_fit']:
                 break
-            if fit_mask[ind_row, ind_col]:
+            if fit_mask[ind_row, ind_col] and fit_result[indpx] is not None:
+                fit_result1 = fit_result[indpx]
                 if par_name == 'x':
-                    parmap[ind_row, ind_col] = fit_result[indpx].x[parind]
+                    parmap[ind_row, ind_col] = fit_result1.fit_result.x[parind]
                 elif par_name == 'err':
-                    parmap[ind_row, ind_col] = fit_result[indpx].fun[parind]
+                    parmap[ind_row, ind_col] = fit_result1.fit_result.fun[parind]
                 indpx += 1
 
     return parmap
