@@ -35,7 +35,7 @@ def tensor_eq(tns1, tns2, thr=get_eps()):
     if isinstance(tns1, list):
         tns1 = np.array(tns1)
     if isinstance(tns2, list):
-        tns1 = np.array(tns2)
+        tns2 = np.array(tns2)
     return (np.abs(tns1 - tns2) <= thr).all()
 
 
