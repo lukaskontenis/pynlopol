@@ -46,7 +46,6 @@ def get_nsm_matrix(
     At the time the code had a last modification timestamp of 2017.07.19, the
     modification year in code was 2015.
     """
-
     # TODO: Translate sample_par parsing
     # Parse delta and alpha angles from the sample_par structure
     # if(~isempty(sample_par))
@@ -69,7 +68,6 @@ def get_nsm_matrix(
     chi = ClassChi(**kwargs)
 
     chi.zero_small_values()
-
 
     # Get the nonlinear order
     if isnone(nlorder):
@@ -137,7 +135,7 @@ def get_nsm_matrix(
         # Since the nonlinear Mueller matrix calculation is performed using
         # the generalized NSMP framework, the primary axis should be Z. For
         # legacy uses it can be changed to X, but this may or may not work.
-        chimat = chi.get_ms_contraction(primary_axis='z')
+        chimat = chi.get_ms_contraction(primary_axis='x')
 
         for ind_t in range(num_rows):
             for ind_N in range(num_col):

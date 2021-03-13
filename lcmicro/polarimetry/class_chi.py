@@ -108,10 +108,9 @@ class ClassChi:
 
                 self.expand()
 
-                # Rotate the tensor for the zcq case
+                # Rotate the tensor around X and Y for the zcq case
                 self.rotate_x(np.pi/2)
-                # Not sure why the Y rotation is not necessary
-                # self.rotate_y(np.pi/6)
+                self.rotate_y(np.pi/6)
 
         elif symmetry_str == 'c6v':
 
