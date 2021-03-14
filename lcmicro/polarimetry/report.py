@@ -242,6 +242,41 @@ def plot_pipo_fit_img(
     if show_fig:
         plt.show()
 
+def plot_piponator_fit():
+    """Plot PIPONATOR fit results."""
+    file_names = list_files_by_pattern('.', match_pattern=['CAK.bin'])
+
+    if len(file_names) == 0:
+        print("No PIPONATOR CAK/SKC files found")
+        return
+
+    if len(file_names) > 1:
+        print("More than one set of CAK/SKC files found, using the first one")
+
+    file_name_cak = file_names[0]
+    file_name_skc = file_name_cak.split('CAK.bin')[0] + 'SKC.bin'
+
+    if not check_file_exists(file_name_skc):
+        print("SKC file not found")
+        return
+
+    cak_data = np.fromfile(file_name_cak, dtype='double')
+    cak_data = cak_data.reshape([13, 128, 128])
+
+    zzz = cak_data[0, :, :]
+    delta = unwrap_angle(cak_data[1, :, :])
+    backg = cak_data[2, :, :]
+    rsqad = cak_data[3, :, :]
+    xyz = cak_data[5, :, :]
+    ampl = cak_data[8, :, :]
+
+    fitdata = ImgFitData()
+    fitdata.set_par({'ampl': ampl, 'backg': backg, 'delta': delta, 'zzz': zzz, 'xyz': xyz})
+    fitdata.set_fit_err(rsqad, type='rsqad')
+    fitdata.cfg.fit_model = 'c6'
+    fitdata.set_mask(rsqad == 0)
+
+    plot_pipo_fit_img(fitdata)
 
 def make_pipo_fig(file_name):
     """Make a PIPO figure from a dataset."""
