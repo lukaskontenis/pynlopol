@@ -16,12 +16,13 @@ import matplotlib.pyplot as plt
 from lklib.util import unwrap_angle
 from lklib.plot import export_figure, imshow_ex
 from lklib.string import get_human_val_str
+from lklib.fileread import list_files_by_pattern, check_file_exists
 
 from lcmicro.proc import load_pipo
 from lcmicro.polarimetry.nsmp_common import get_num_states, \
     get_nsmp_state_order
 from lcmicro.polarimetry.nsmp_sim import simulate_pipo
-from lcmicro.polarimetry.fitdata import get_parmap
+from lcmicro.polarimetry.imgfitdata import ImgFitData
 
 
 def plot_pipo(
@@ -196,21 +197,24 @@ def plot_pipo_fit_img(
     """Make a PIPO fit result figure for an image."""
     plt.figure(figsize=[10, 10])
 
-    ax = plt.subplot(2, 2, 1)
-    total_cnt_img = np.sum(np.sum(pipo_arr, 2), 2)
-    total_cnt_img[0, 0] = 0
-    imshow_ex(
-        total_cnt_img, bad_color='black', ax=ax, logscale=True, cmap='viridis',
-        title_str='SHG intensity', with_hist=True)
+    if pipo_arr is not None:
+        ax = plt.subplot(2, 2, 1)
+        total_cnt_img = np.sum(np.sum(pipo_arr, 2), 2)
+        total_cnt_img[0, 0] = 0
+        imshow_ex(
+            total_cnt_img, bad_color='black', ax=ax, logscale=True, cmap='viridis',
+            title_str='SHG intensity', with_hist=True)
+    else:
+        print("PIPO array not available, total count image will not be shown")
 
-    fit_model = fitdata['model']
+    fit_model = fitdata.get_fit_model()
     zzz = None
-    if fit_model in ['zcq', 'c6v']:
-        ampl = get_parmap(fitdata, 'x', 0)
-        delta = get_parmap(fitdata, 'x', 1)
+    if fit_model in ['zcq', 'c6v', 'c6']:
+        ampl = fitdata.get_par()['ampl']
+        delta = fitdata.get_par()['delta']
 
-    if fit_model == 'c6v':
-        zzz = get_parmap(fitdata, 'x', 2)
+    if fit_model in ['c6v', 'c6']:
+        zzz = fitdata.get_par()['zzz']
 
     ax = plt.subplot(2, 2, 2)
     imshow_ex(

@@ -17,5 +17,8 @@ from lcmicro.polarimetry.nsmp_common import *
 from lcmicro.polarimetry.nsmp import *
 from lcmicro.polarimetry.nsmp_sim import *
 from lcmicro.polarimetry.fitdata import *
+from lcmicro.polarimetry.imgfitdata import *
+from lcmicro.polarimetry.fitconfig import *
+from lcmicro.polarimetry.imgfitconfig import *
 from lcmicro.polarimetry.gen_pol_state_sequence import gen_pol_state_sequence
 from lcmicro.polarimetry.verify_pol_state_sequence import verify_pol_state_sequence

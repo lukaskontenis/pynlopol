@@ -14,185 +14,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import least_squares
 from scipy.interpolate import interpn
-from tabulate import tabulate
 
-from lklib.string import get_human_val_str, arr_summary_str
-from lklib.util import handle_general_exception, unwrap_angle, ask_yesno, find_closest
+from lklib.string import get_human_val_str
+from lklib.util import handle_general_exception, unwrap_angle, ask_yesno, \
+    find_closest
 from lklib.fileread import check_file_exists
 
 from lcmicro.proc import load_pipo
 from lcmicro.polarimetry.report import plot_pipo_fit_img, plot_pipo_fit_1point
 from lcmicro.polarimetry.nsmp_sim import simulate_pipo
-from lcmicro.polarimetry.fitdata import get_parmap
-
-
-class FitStruct:
-    """Fit Struct class."""
-    fit_model = None
-    fit_result = None
-    ref_pars = None
-    fitfun_name = None
-    duration = None
-
-    def __init__(
-            self, fit_model=None, fit_result=None, fitfun_name=None,
-            duration=None):
-        """Initialize FitStruct instance."""
-        self.fit_model = fit_model
-        self.fit_result = fit_result
-        self.fitfun_name = fitfun_name
-        self.duration = duration
-
-    def set_ref_pars(self, ref_pars):
-        """Set reference parameters."""
-        self.ref_pars = ref_pars
-
-    def get_fit_params(self):
-        """Get fit parameters."""
-        if self.fit_model == 'zcq':
-            ampl = self.fit_result.x[0]
-            delta = self.fit_result.x[1]
-            delta_period = 60/180*np.pi
-            delta = unwrap_angle(delta, period=delta_period)
-            return {'ampl': ampl, 'delta': delta}
-        elif self.fit_model == 'c6v':
-            ampl = self.fit_result.x[0]
-            delta = self.fit_result.x[1]
-            zzz = self.fit_result.x[2]
-            delta_period = 180/180*np.pi
-            delta = unwrap_angle(delta, period=delta_period)
-            return {'ampl': ampl, 'zzz': zzz, 'delta': delta}
-        else:
-            print("Cannot handle '{:s}' model".format(self.fit_model))
-
-    def print(self, style='list'):
-        """Print PIPO fit results for a single point."""
-        fitpar = self.get_fit_params()
-        print("=== PIPO fit results ===")
-
-        err = self.fit_result.fun[0]
-
-        par_fmt = {'ampl': {'suppress_suffix': 'm'},
-                   'zzz': {'num_sig_fig': 3, 'suppress_suffix': 'm'},
-                   'delta': {'num_sig_fig': 3}}
-
-        par_type = {'ampl': 'gen',
-                    'zzz': 'ratio',
-                    'delta': 'angle'}
-
-        par_varstr = {'ampl': 'A',
-                      'zzz': 'R',
-                      'delta': 'δ'}
-
-        typical_err = {'zzz': 0.01,
-                       'delta': 0.1/180*np.pi}
-
-        par_names = list(fitpar.keys())
-        par_str = []
-        for ind, par_val in enumerate(fitpar.values()):
-            par_name = par_names[ind]
-            if par_type[par_name] == 'angle':
-                par_val = par_val/np.pi*180
-            par_str.append(get_human_val_str(par_val, **par_fmt[par_name]))
-
-        err_str = get_human_val_str(err)
-
-        par_rsd = []
-
-        print('Fit model: {:s}'.format(self.fit_model))
-        print('Fit function: {:s}'.format(self.fitfun_name))
-        print('Duration: ' + get_human_val_str(self.duration, is_time=True))
-
-        if style == 'list':
-            print('Parameters:')
-            for ind, par_name in enumerate(par_names):
-                ss = '\t' + par_varstr[par_name] + ' = ' + par_str[ind]
-                if self.ref_pars is not None:
-                    ref_par = self.ref_pars.get(par_name)
-                    if ref_par is not None:
-                        par_err = np.abs(fitpar[par_name] - ref_par)
-                        # par_rsd.append(par_err)
-                        if par_type[par_name] == 'angle':
-                            ref_par = ref_par/np.pi*180
-                            par_err = par_err/np.pi*180
-                        ss += ',\tref = ' + get_human_val_str(ref_par, **par_fmt[par_name])
-                        ss += ',\terr = ' + get_human_val_str(par_err, **par_fmt[par_name])
-                print(ss)
-            print('Fit residual RMSE: {:s}\n'.format(err_str))
-
-        elif style == 'table':
-            headers = ['Parameter', 'Fit', 'Ref', 'Err', 'P/F']
-            table_rows = []
-            for ind, par_name in enumerate(par_names):
-                table_row = []
-                table_row.append(par_varstr[par_name])
-                table_row.append(get_par_human_val_str(par_name, fitpar[par_name]))
-                if self.ref_pars is not None:
-                    ref_par = self.ref_pars.get(par_name)
-                    if ref_par is not None:
-                        par_err = fitpar[par_name] - ref_par
-                        # par_rsd.append(np.abs(par_err)/typical_err[par_name])
-                        table_row.append(get_par_human_val_str(par_name, ref_par))
-                        table_row.append(get_par_human_val_str(par_name, par_err))
-                        if np.abs(par_err) < typical_err[par_name]:
-                            table_row.append('PASS')
-                        else:
-                            table_row.append('FAIL')
-
-                table_rows.append(table_row)
-
-            print(tabulate(table_rows, headers=headers))
-            print("\n")
-
-        # Calculate average parameter RSD
-        # TODO: This needs work. Neither is it RSD, nor is it that useful to
-        # compare fit error to the expected error, which results in e.g. a
-        # relative error of 20%.
-        if len(par_rsd) > 0:
-            avg_par_rsd = np.mean(par_rsd)
-            print('Average parameter RSD: {:.1f}%'.format(avg_par_rsd*100))
-            if avg_par_rsd > 0.1:
-                print('Fit is not very good, off by 10%')
-            elif avg_par_rsd < 0.001:
-                print('Fit is perfect, off by less than 0.1%')
-
-
-def print_par(par_names, par_vals):
-    """Print parameters in a single line."""
-    out_str = ''
-    for ind, par_name in enumerate(par_names):
-        out_str += par_name + ' = ' + get_par_human_val_str(par_name, par_vals[ind]) + ' '
-
-    return out_str
-
-
-def get_par_human_val_str(par_name, par_val):
-    """Convert a parameter to a human-readable string."""
-    par_fmt = {'ampl': {'suppress_suffix': 'm'},
-               'zzz': {'num_decimal_places': 3, 'suppress_suffix': 'm'},
-               'delta': {'num_decimal_places': 2, 'suppress_suffix': 'm'}}
-
-    par_type = {'ampl': 'gen',
-                'zzz': 'ratio',
-                'delta': 'angle'}
-
-    par_varstr = {'ampl': 'A',
-                  'zzz': 'R',
-                  'delta': 'δ'}
-
-    typical_err = {'zzz': 0.01,
-                   'delta': 0.1/180*np.pi}
-
-    # Unit string, with space if necessary
-    unit_str = {'gen': '',
-                'ratio': '',
-                'angle': '°'}
-
-    if par_type[par_name] == 'angle':
-        par_val = par_val/np.pi*180
-
-    return get_human_val_str(
-        par_val, **par_fmt[par_name]) + unit_str[par_type[par_name]]
+from lcmicro.polarimetry.fitdata import FitData
+from lcmicro.polarimetry.imgfitdata import ImgFitData, ImgFitConfig
 
 
 def get_default_fitdata_filename():
@@ -203,52 +35,6 @@ def get_default_fitdata_filename():
 def get_default_fitaccel_filename():
     """Get default fit accelerator filte name."""
     return 'fit_accel_c6v.npy'
-
-
-def print_fit_result_img(fitdata):
-    """Print PIPO fit results for an image."""
-    print("=== Fit results ===")
-
-    data_type = fitdata['data_type']
-    print("Data type: " + data_type)
-
-    fit_model = fitdata['model']
-
-    fit_mask = fitdata['mask']
-    num_row, num_col = np.shape(fit_mask)
-    num_px = num_row*num_col
-    num_pts_to_fit = fitdata['num_pts_to_fit']
-    if data_type == 'img':
-        print("Image size: {:d}x{:d}".format(num_row, num_col))
-        print("Fit threshold: {:d} c.".format(fitdata['mask_thr']))
-        num_thr = np.sum(fit_mask)
-        print("Number of px. above threshold: {:d}, {:.0f}%".format(
-            num_thr, num_thr/num_px*100))
-
-        if num_pts_to_fit < num_thr:
-            print("Number of px. fitted: {:d}, {:.0f}%".format(
-                num_pts_to_fit, num_pts_to_fit/num_px*100))
-
-    zzz = None
-    if fit_model in ['zcq', 'c6v']:
-        ampl = get_parmap(fitdata, 'x', 0)
-        delta = get_parmap(fitdata, 'x', 1)
-
-    if fit_model == 'c6v':
-        zzz = get_parmap(fitdata, 'x', 2)
-
-    err = get_parmap(fitdata, 'err', 0)
-
-    print('Fit model: {:s}'.format(fit_model))
-    print('Parameters:')
-    print('\tA: ' + arr_summary_str(ampl, suppress_suffix='m'))
-    print('\tδ (°): ' + arr_summary_str(delta/np.pi*180, num_sig_fig=3))
-    if zzz is not None:
-        print('\tzzz: ' + arr_summary_str(
-            zzz, num_sig_fig=3, suppress_suffix='m'))
-
-    print('RMS residual error: ' + arr_summary_str(err))
-    print('\n')
 
 
 def pipo_fitfun(
@@ -392,7 +178,7 @@ def pipo_c6v_fitfun(
     if plot_progress:
         print("\nIter: " + print_par(['ampl', 'delta', 'zzz'], par) +
               ", rmse={:.3f}".format(err))
-    elif vlvl >=1:
+    elif vlvl >= 1:
         print('.', end='', flush=True)
 
     return err
@@ -487,7 +273,7 @@ def fit_pipo_1point(
         pipo_arr=None, file_name=None, fit_model='zcq', fitfun_name=None,
         map_guess=True, use_fit_accel=False, fit_accel=None, diff_step=None,
         plot_progress=False, print_results=True, plot_fig=True,
-        true_par=None, vlvl=2,
+        true_par=None, vlvl=1,
         **kwargs):
     """Fit PIPO using single-point data."""
     t_start = time.time()
@@ -633,7 +419,10 @@ def fit_pipo_1point(
         bounds=bounds, kwargs=fit_cfg)
 
     fit_duration = time.time() - t_start
-    fit_st = FitStruct(fit_model, fit_result, fitfun_name, fit_duration)
+    fitdata = FitData(fit_result)
+    fitdata.set_fit_model(fit_model)
+    fitdata.set_fitfun_name(fitfun_name)
+    fitdata.set_fit_duration(fit_duration)
 
     if vlvl >= 1:
         print("Done")
@@ -642,7 +431,7 @@ def fit_pipo_1point(
         plt.close()
 
     if print_results:
-        fit_st.print()
+        fitdata.print()
 
     if plot_fig:
         fit_data = None
@@ -652,7 +441,7 @@ def fit_pipo_1point(
         plot_pipo_fit_1point(pipo_arr, fit_data=fit_data, fit_par=fit_result.x,
                              **fit_cfg, **kwargs)
 
-    return fit_st
+    return fitdata
 
 
 def fit_pipo_img(
@@ -670,12 +459,12 @@ def fit_pipo_img(
     if use_fit_accel and fit_model != 'c6v':
         raise Exception("Fit acceleration only supported for c6v")
 
-    num_row, num_col = np.shape(pipo_arr)[0:2]
+    fcfg = ImgFitConfig()
+    fcfg.set_fit_model(fit_model)
+    fcfg.set_max_fit_pts(max_fit_pts)
 
-    if use_fit_accel:
-        fit_accel, diff_step = get_fit_accel()
-    else:
-        fit_accel = diff_step = None
+    num_row, num_col = np.shape(pipo_arr)[0:2]
+    fcfg.set_sz([num_row, num_col])
 
     auto_fit_mask = kwargs.get('auto_fit_mask', True)
     if auto_fit_mask:
@@ -687,6 +476,9 @@ def fit_pipo_img(
             for ind_col in range(num_col):
                 if np.sum(pipo_arr[ind_row, ind_col, :, :]) >= cnt_thr:
                     fit_mask[ind_row, ind_col] = True
+
+        fcfg.set_mask(fit_mask)
+        fcfg.set_mask_thr(cnt_thr)
 
     num_fit_pts = np.sum(fit_mask)
     num_pts_to_fit = num_fit_pts
@@ -744,8 +536,8 @@ def fit_pipo_img(
                     handle_general_exception(Exception)
                 fit_result1 = None
 
-            if not fit_result1.fit_result.success:
-                print("Fitting failed")
+            if not fit_result1.is_fit_success():
+                print("Fit at point ({:d},{:d}) did not converge".format(ind_row, ind_col))
 
             fit_result.append(fit_result1)
             ind_fit += 1
@@ -754,30 +546,26 @@ def fit_pipo_img(
     fit_rate = num_pts_to_fit/elapsed_time
     print("Fitting completed in {:.1f} s at {:.1f} pts/s rate".format(elapsed_time, fit_rate))
 
-    fitdata = {}
-    fitdata['data_type'] = 'img'  # 'img', '1point'
-    fitdata['model'] = 'c6v'
-    fitdata['mask'] = fit_mask
-    fitdata['mask_thr'] = 50
-    fitdata['num_pts_to_fit'] = num_pts_to_fit
-    fitdata['result'] = fit_result
+    imgfitdata = ImgFitData(fit_result)
+    imgfitdata.cfg = fcfg
+    imgfitdata.duration = elapsed_time
 
     print("Saving intermediate fit data to 'fitdata.npy'...")
-    np.save('fitdata.npy', [fitdata])
+    np.save('fitdata.npy', [imgfitdata])
 
     if print_results:
-        print_fit_result_img(fitdata)
+        imgfitdata.print()
 
     if plot_results:
-        plot_pipo_fit_img(fitdata, pipo_arr=pipo_arr)
+        plot_pipo_fit_img(imgfitdata, pipo_arr=pipo_arr)
 
-    return fitdata
+    return imgfitdata
 
 
 def fit_pipo(
         pipo_arr=None, file_name=None,
         binsz=None, cropsz=None,
-        show_input=False, **kwargs):
+        ask_before_overwrite=True, show_input=False, **kwargs):
     """Fit a PIPO model to data.
 
     Fit a PIPO model to a single PIPO map or a 4D array for an image where each
@@ -813,7 +601,8 @@ def fit_pipo(
         fitdata dict containing fit parameters and results
     """
     fitdata_filename = get_default_fitdata_filename()
-    if check_file_exists(fitdata_filename) and not ask_yesno(
+    if ask_before_overwrite and check_file_exists(fitdata_filename) and \
+        not ask_yesno(
             "A " + fitdata_filename + " file containing the fit results "
             "already exists and will be overwritten. Do you want to continue?",
             default='no'):
