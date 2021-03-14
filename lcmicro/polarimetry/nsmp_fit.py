@@ -527,7 +527,6 @@ def fit_pipo_img(
                     pipo_arr1, fit_model=fit_model,
                     plot_progress=plot_progress, use_fit_accel=use_fit_accel,
                     print_results=False, plot_fig=False,
-                    fit_accel=fit_accel, diff_step=diff_step,
                     vlvl=vlvl1,
                     **kwargs)
             except Exception:
@@ -610,12 +609,7 @@ def fit_pipo(
         return None
 
     fitaccel_filename = get_default_fitaccel_filename()
-    if kwargs.get('use_fit_accel', False) \
-            and not check_file_exists(fitaccel_filename):
-        print("Fit accelertion is enabled, but " + fitaccel_filename +
-              " was not found. Acceleration file generation will be "
-              "implemented in the future, until then this file is required.")
-        #return None
+    fit_accel = get_fit_accel(kwargs.get('fit_model'))[0]
 
     if show_input:
         pipo_arr = load_pipo(file_name, binsz=None, cropsz=cropsz)
@@ -628,6 +622,6 @@ def fit_pipo(
         pipo_arr = load_pipo(file_name, binsz=binsz, cropsz=cropsz)
 
     if len(np.shape(pipo_arr)) == 4:
-        return fit_pipo_img(pipo_arr, **kwargs)
+        return fit_pipo_img(pipo_arr, fit_accel=fit_accel, **kwargs)
     else:
-        return fit_pipo_1point(pipo_arr, **kwargs)
+        return fit_pipo_1point(pipo_arr, fit_accel=fit_accel, **kwargs)
