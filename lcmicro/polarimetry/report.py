@@ -211,7 +211,7 @@ def plot_pipo_fit_img(
     zzz = None
     if fit_model in ['zcq', 'c6v', 'c6']:
         ampl = fitdata.get_par()['ampl']
-        delta = fitdata.get_par()['delta']
+        delta = unwrap_angle(fitdata.get_par()['delta'])
 
     if fit_model in ['c6v', 'c6']:
         zzz = fitdata.get_par()['zzz']
@@ -223,7 +223,7 @@ def plot_pipo_fit_img(
 
     ax = plt.subplot(2, 2, 3)
     imshow_ex(
-        delta, vmin=0, vmax=180, ax=ax, logscale=False, cmap='hsv', title_str='delta (deg)',
+        delta, vmin=-90, vmax=90, ax=ax, logscale=False, cmap='hsv', title_str='delta (deg)',
         with_hist=True, is_angle=True)
 
     ax = plt.subplot(2, 2, 4)
