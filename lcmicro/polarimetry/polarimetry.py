@@ -261,9 +261,8 @@ def get_waveplate_retardation(wavl=None, biref=0.0092, thickness=None):
     Default birefringence is 0.0092 for a quartz waveplate in green.
     Retartadtion is returned in waves.
     """
-    rtrd = (2*biref*thickness/wavl)  # in terms of pi
-    rtrd = rtrd - 2*np.floor(rtrd/2)  # Subtract full waves, in terms of pi
-    rtrd = rtrd/2  # Retardance in terms of waves
+    rtrd = biref*thickness/wavl  # in waves
+    #rtrd = np.mod(rtrd, 1)
     return rtrd
 
 
