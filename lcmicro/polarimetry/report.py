@@ -242,7 +242,7 @@ def plot_pipo_fit_img(
     if show_fig:
         plt.show()
 
-def plot_piponator_fit():
+def plot_piponator_fit(**kwargs):
     """Plot PIPONATOR fit results."""
     file_names = list_files_by_pattern('.', match_pattern=['CAK.bin'])
 
@@ -263,6 +263,11 @@ def plot_piponator_fit():
     cak_data = np.fromfile(file_name_cak, dtype='double')
     cak_data = cak_data.reshape([13, 128, 128])
 
+    crop_sz = kwargs.get('crop_sz')
+    if crop_sz is not None:
+        print("Cropping fit data...")
+        cak_data = cak_data[:, crop_sz[0]:crop_sz[1], crop_sz[2]:crop_sz[3]]
+
     zzz = cak_data[0, :, :]
     delta = unwrap_angle(cak_data[1, :, :])
     backg = cak_data[2, :, :]
@@ -276,7 +281,7 @@ def plot_piponator_fit():
     fitdata.cfg.fit_model = 'c6'
     fitdata.set_mask(rsqad == 0)
 
-    plot_pipo_fit_img(fitdata)
+    plot_pipo_fit_img(fitdata, **kwargs)
 
 def make_pipo_fig(file_name):
     """Make a PIPO figure from a dataset."""
