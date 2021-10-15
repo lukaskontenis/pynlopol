@@ -238,20 +238,21 @@ def get_psgpsa_vector(angles, input_state='hlp'):
 
 
 def get_waveplate_thickness(
-        plate_type='hwp', wavl=None, biref=0.0092, worder=0):
+        target_rtrd=None, plate_type='hwp', wavl=None, biref=0.0092, worder=0):
     """Get waveplate thickness given its order and birefringence.
 
     Default birefringence is 0.0092 for a quartz waveplate in green. Thickess
     is returned in the same units as wavelength.
     """
+    if target_rtrd is not None:
+        return target_rtrd*wavl/biref
     if plate_type == 'hwp':
-        fac = 1
+        return (2*worder + 1)*wavl / (2*biref)
     elif plate_type == 'qwp':
-        fac = 0.5
+        return (2*worder + 1)*wavl/2 / (2*biref)
     else:
         print("Unsupported plate type " + plate_type)
         return None
-    return (2*worder + 1)*wavl*fac / (2*biref)
 
 
 def get_waveplate_retardation(wavl=None, biref=0.0092, thickness=None):
