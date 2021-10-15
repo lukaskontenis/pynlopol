@@ -91,6 +91,12 @@ def get_mueller_mat(element, theta=0, **kwargs):
         mat[3, 2] = -s
         mat[3, 3] = c
 
+    elif element in ("rotator", "fr"):
+        mat[0, 0] = 1
+        mat[1, 1] = 1
+        mat[2, 3] = -1
+        mat[3, 2] = 1
+
     elif element in ("plz", "pol", "polarizer"):
         mat[0, 0] = 1
         mat[0, 1] = 1
@@ -116,6 +122,44 @@ def get_mueller_mat(element, theta=0, **kwargs):
         mat[1, 1] = 1
         mat[2, 2] = 1
         mat[3, 3] = 1
+
+    elif element in ('fresnel_trans'):
+        ai = kwargs.get('ai', 0)
+        n1 = kwargs.get('n1', 1)
+        n2 = kwargs.get('n2', 1.5)
+        ar = np.arcsin(n1/n2*sin(ai))
+
+        ts = np.tan(ai)/np.tan(ar) * (2*np.sin(ar)*np.cos(ai)/np.sin(ar + ai))**2
+        tp = np.tan(ai)/np.tan(ar) * (2*np.sin(ar)*np.cos(ai)/(np.sin(ar + ai)*np.cos(ai - ar)))**2
+
+        mat[0, 0] = ts + tp
+        mat[0, 1] = ts - tp
+        mat[1, 0] = ts - tp
+        mat[1, 1] = ts + tp
+
+        mat[2, 2] = 2*np.sqrt(ts*tp)
+        mat[3, 3] = 2*np.sqrt(ts*tp)
+
+        mat = mat * 0.5
+
+    elif element in ('fresnel_refl'):
+        ai = kwargs.get('ai', 0)
+        n1 = kwargs.get('n1', 1)
+        n2 = kwargs.get('n2', 1.5)
+        ar = np.arcsin(n1/n2*sin(ai))
+
+        rs = (np.sin(ai - ar)/np.sin(ar + ai))**2
+        rp = (np.tan(ai - ar)/np.tan(ar + ai))**2
+
+        mat[0, 0] = rs + rp
+        mat[0, 1] = rs - rp
+        mat[1, 0] = rs - rp
+        mat[1, 1] = rs + rp
+
+        mat[2, 2] = 2*np.sqrt(rs*rp)
+        mat[3, 3] = 2*np.sqrt(rs*rp)
+
+        mat = mat * 0.5
 
     else:
         print("Element ''{:s}'' not defined".format(element))
