@@ -117,7 +117,7 @@ def pipo_c6_fun(par):
     """
     # TODO: fix this
     psg_states = np.arange(0.0, 180.0, 22.5)/180*np.pi
-    psa_states = np.arange(0.0, 180.0, 22.5)/180*np.pi
+    psa_states = psg_states # np.arange(0.0, 180.0, 22.5)/180*np.pi
     fit_data = np.ndarray([len(psg_states), len(psa_states)])
 
     ampl = par[0]
@@ -125,15 +125,34 @@ def pipo_c6_fun(par):
     zzz = par[2]
     xyz = par[3]
 
+    sin_ad = np.empty_like(psa_states)
+    cos_ad = np.empty_like(psa_states)
+
+    for ind, psa in enumerate(psa_states):
+       sin_ad[ind] = np.sin(psa-delta)
+       cos_ad[ind] = np.cos(psa-delta)
+
     # TODO: implement optional background fitting
     bckg = 0
     for ind_psg, psg in enumerate(psg_states):
+        sin_2gd = np.sin(2*(psg-delta))
+        cos_gd2 = np.cos(psg-delta)**2
+        sin_gd2 = np.sin(psg-delta)**2
+
         for ind_psa, psa in enumerate(psa_states):
-            fit_data[ind_psa, ind_psg] = ampl*(
-                np.sin(psa-delta)*np.sin(2*(psg-delta)) +
-                np.cos(psa-delta)*np.sin(psg-delta)**2 +
-                zzz*np.cos(psa-delta)*np.cos(psg-delta)**2 +
-                2*xyz*np.cos(psg-delta)*np.sin(psg-psa))**2 + bckg
+            fit_data[ind_psa, ind_psg] = (
+                sin_ad[ind_psa]*sin_2gd +
+                cos_ad[ind_psa]*sin_gd2 +
+                zzz*cos_ad[ind_psa]*cos_gd2)
+
+            # fit_data[ind_psa, ind_psg] = ampl*(
+            #     np.sin(psa-delta)*np.sin(2*(psg-delta)) +
+            #     np.cos(psa-delta)*np.sin(psg-delta)**2 +
+            #     zzz*np.cos(psa-delta)*np.cos(psg-delta)**2 +
+            #     2*xyz*np.cos(psg-delta)*np.sin(psg-psa))**2 + bckg
+
+    fit_data *= fit_data
+    fit_data *= ampl
 
     return fit_data
 

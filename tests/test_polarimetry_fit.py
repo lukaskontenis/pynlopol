@@ -98,8 +98,6 @@ class TestPolarimetryFit(unittest.TestCase):
             print(fit_model + ' fitting FAILED')
             self.assertTrue(False)
 
-TestPolarimetryFit().test_c6v_pipo_img_fit()
-
 if __name__ == '__main__':
     unittest.main(exit=False)
     input("Press any key to close this window.")
