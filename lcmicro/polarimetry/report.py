@@ -229,7 +229,7 @@ def plot_pipo_fit_img(
     ax = plt.subplot(2, 2, 4)
     imshow_ex(
         zzz, ax=ax, logscale=False, cmap='plasma', title_str='zzz',
-        min_vspan=0.2,
+        vmin=0.5, vmax=3, min_vspan=0.2,
         with_hist=True)
 
     if export_fig:
