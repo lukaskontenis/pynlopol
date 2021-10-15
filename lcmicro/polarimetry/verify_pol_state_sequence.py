@@ -129,13 +129,13 @@ def verify_pol_state_sequence(
             # When reference states are used, there is an extra reference state
             # after each PSA cycle. The reference state is assumed to have the
             # 0 th index.
-            ind_psa = np.divmod(ind_seq, 7)[1]
+            ind_psa = np.divmod(ind_seq, len(psa_states)+1)[1]
             if ind_psa == 6:
                 ind_psa = 0
         else:
-            ind_psa = np.divmod(ind_seq, 6)[1]
+            ind_psa = np.divmod(ind_seq, len(psa_states))[1]
 
-        # To test PSA, take the true PSA state names and calculte the outgoing
+        # To test PSA, take the true PSA state names and calculate the outgoing
         # vector after the PSA using the test and true angles. If the
         # outgoing vector corresponds to the output state of the PSA the
         # polarimeter is working correctly.
