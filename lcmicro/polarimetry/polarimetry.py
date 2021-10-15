@@ -309,6 +309,95 @@ def plot_waveplate_response(
         plt.ylabel('Transmitted power, a.u.')
 
 
+def plot_retarder_response(
+        rtrd=None, theta=None, title_str=None, finalize_figure=True):
+    """Plot retarder transmission response.
+
+    Plot the intensity transmited through a variable retarder fixed at the given
+    orientation. This configuration is applicable to liquid crystal modulators
+    and Pockels cells.
+    """
+    in_svec = get_stokes_vec('hlp')
+    pol_mmat = get_mueller_mat('pol')
+
+    det_ampl = np.empty_like(rtrd)
+
+    for ind, rtrd1 in enumerate(rtrd):
+        rtd_mmat = get_mueller_mat('rtd', theta, d=rtrd1)
+        out_svec = pol_mmat.dot(rtd_mmat.dot(in_svec))
+        det_ampl[ind] = out_svec[0]
+
+    rtrd_deg = rtrd/np.pi*180
+    plt.plot(rtrd_deg, det_ampl)
+
+    if finalize_figure:
+        add_y_marker(0)
+        add_y_marker(1)
+        plt.ylim([-0.1, 1.1])
+        plt.xlim([np.min(rtrd_deg), np.max(rtrd_deg)])
+        plt.grid('on')
+        #plt.xticks(np.arange(0, 361, 45))
+        if title_str is None:
+            title_str = 'Variable retarder response'
+        plt.title(title_str)
+        plt.xlabel('Retardance, deg')
+        plt.ylabel('Transmitted power, a.u.')
+
+
+def plot_pockels_response(
+        vctrl=None, theta=None, title_str=None, finalize_figure=True, with_qwp=False):
+    """Plot Pockels cell transmission response.
+
+    Plot the intensity transmited through a variable retarder fixed at the given
+    orientation. This configuration is applicable to liquid crystal modulators
+    and Pockels cells.
+    """
+    vhwp = 1000
+    rtrd = vctrl/vhwp*np.pi
+
+    in_svec = get_stokes_vec(10)
+    pol_mmat = get_mueller_mat('pol')
+    qwp_mmat = get_mueller_mat('qwp', np.pi/4)
+
+    det_ampl = np.empty_like(rtrd)
+    out_svec = np.ndarray([len(det_ampl), 4])
+
+    for ind, rtrd1 in enumerate(rtrd):
+        rtd_mmat = get_mueller_mat('rtd', theta, d=rtrd1)
+        svec = in_svec
+        if with_qwp:
+            svec = qwp_mmat.dot(svec)
+        svec = rtd_mmat.dot(svec)
+        out_svec[ind, :] = np.transpose(svec)
+        svec = pol_mmat.dot(svec)
+        det_ampl[ind] = svec[0]
+
+    plt.subplot(2, 1, 1)
+    plt.plot(vctrl, det_ampl)
+    add_y_marker(0)
+    add_y_marker(1)
+    plt.grid('on')
+    if title_str is None:
+        title_str = 'Pockels cell response (theta={:.0f} deg)'.format(theta/np.pi*180)
+    plt.title(title_str)
+    plt.ylabel('Transmitted power, a.u.')
+    plt.ylim([-0.1, 1.1])
+    plt.xlim([np.min(vctrl), np.max(vctrl)])
+
+    plt.subplot(2, 1, 2)
+    docp = np.abs(out_svec[:, 3])/out_svec[:, 0]
+    dolp = 1 - docp
+    plt.plot(vctrl, dolp)
+    plt.plot(vctrl, docp)
+    add_y_marker(0)
+    add_y_marker(1)
+    plt.grid('on')
+    plt.ylabel('DOLP/DOCP')
+    plt.ylim([-0.1, 1.1])
+    plt.xlim([np.min(vctrl), np.max(vctrl)])
+    plt.xlabel('Voltage, V')
+
+
 def test_pol_trans():
     """Test polarizer transmission."""
     svec_in = get_stokes_vec("HLP")
