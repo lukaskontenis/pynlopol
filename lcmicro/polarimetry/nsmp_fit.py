@@ -338,9 +338,7 @@ def fit_pipo_1point(
     }
 
     if vlvl >= 1:
-        print("Fitting data", end='')
-    elif vlvl >= 2:
-        print("Fitting data")
+        print("Determining guess values...")
 
     # Use a sparse map covering all expected parameter ranges to find a good
     # guess value
@@ -368,6 +366,10 @@ def fit_pipo_1point(
             guess_par = [max_ampl, pargrid[guess_inds[0]]]
             diff_step = [0.001, 0.01/180*np.pi]
 
+            if vlvl >= 1:
+                print("Guess values: A={:.1f}M, δ={:.1f}°".format(
+                    guess_par[0]*1E-6, guess_par[1]/np.pi*180))
+
         elif fit_model == 'c6v':
             guess_inds = np.unravel_index(
                 np.argmin(err), [len(pargrid[0]), len(pargrid[1])])
@@ -375,6 +377,10 @@ def fit_pipo_1point(
                          pargrid[0][guess_inds[0]],
                          pargrid[1][guess_inds[1]]]
             diff_step = [0.001, 0.01/180*np.pi, 0.001]
+
+            if vlvl >= 1:
+                print("Guess values: A={:.1f}M, zzz={:.2f}, δ={:.1f}°".format(
+                    guess_par[0]*1E-6, guess_par[1], guess_par[2]/np.pi*180))
 
         if vlvl >= 2 and true_par is not None:
             for ind, guess_par1 in enumerate(guess_par):
@@ -390,6 +396,11 @@ def fit_pipo_1point(
             'plot_progress': plot_progress,
             'vlvl': vlvl
         }
+
+    if vlvl >= 1:
+        print("Fitting data", end='')
+    elif vlvl >= 2:
+        print("Fitting data")
 
     if fit_model == 'c6v':
         if fitfun_name is None:
