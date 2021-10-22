@@ -350,9 +350,7 @@ def plot_pockels_response(
         with_qwp=False):
     """Plot Pockels cell transmission response.
 
-    Plot the intensity transmited through a variable retarder fixed at the given
-    orientation. This configuration is applicable to liquid crystal modulators
-    and Pockels cells.
+    Plot the intensity transmited through a Pockels cell.
     """
     vhwp = 1000
     rtrd = vctrl/vhwp*np.pi
