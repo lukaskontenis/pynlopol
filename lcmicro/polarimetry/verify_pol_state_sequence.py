@@ -7,7 +7,7 @@ polarization state sequences for nonlinear PIPO and NSMP measurements.
 This module is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2021 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 
@@ -69,7 +69,8 @@ def verify_pol_state_sequence(
         # Assuming test sequence has sequence ID in first column
         test_angles = test_seq[:, 1:]
     else:
-        print("Test sequence has an unsupported number of columns ({:d}), should be 5 or 6".format(test_num_col))
+        print("Test sequence has an unsupported number of columns " +
+              "({:d}), should be 5 or 6".format(test_num_col))
         return False
 
     # Generate the true sequence
@@ -174,7 +175,8 @@ def verify_pol_state_sequence(
         return True
     elif bad_states < test_shape[0]:
         if vlvl >= 1:
-            print("{:d} of {:d} states are incorrect".format(bad_states, test_shape[0]))
+            print("{:d} of {:d} states are incorrect".format(bad_states,
+                                                             test_shape[0]))
         return False
     else:
         if vlvl >= 1:

@@ -20,7 +20,7 @@ measured by the signal detector.
 
 The sequence file contains 6 columns:
     [PSG ID], [PSA ID], [PSG HWP], [PSG QWP], [PSA HWP], [PSA QWP]
-    
+
 where PSG and PSA IDs are indices of the unique input and output states and
 PSG/PSA HWP/QWP are the orientation angles of the half- and quarter-wave plates
 for the PSG and PSA.
@@ -40,7 +40,8 @@ Contact: dse.ssd@gmail.com
 # flake8: noqa
 # pylint: skip-file
 
-from lcmicro.polarimetry import gen_pol_state_sequence, verify_pol_state_sequence
+from lcmicro.polarimetry import gen_pol_state_sequence, \
+    verify_pol_state_sequence
 
 par = {
     'file_name': 'PolStates.dat',

@@ -129,8 +129,10 @@ def get_mueller_mat(element, theta=0, **kwargs):
         n2 = kwargs.get('n2', 1.5)
         ar = np.arcsin(n1/n2*sin(ai))
 
-        ts = np.tan(ai)/np.tan(ar) * (2*np.sin(ar)*np.cos(ai)/np.sin(ar + ai))**2
-        tp = np.tan(ai)/np.tan(ar) * (2*np.sin(ar)*np.cos(ai)/(np.sin(ar + ai)*np.cos(ai - ar)))**2
+        ts = np.tan(ai)/np.tan(ar) * \
+            (2*np.sin(ar)*np.cos(ai)/np.sin(ar + ai))**2
+        tp = np.tan(ai)/np.tan(ar) * \
+            (2*np.sin(ar)*np.cos(ai)/(np.sin(ar + ai)*np.cos(ai - ar)))**2
 
         mat[0, 0] = ts + tp
         mat[0, 1] = ts - tp
@@ -262,7 +264,7 @@ def get_waveplate_retardation(wavl=None, biref=0.0092, thickness=None):
     Retartadtion is returned in waves.
     """
     rtrd = biref*thickness/wavl  # in waves
-    #rtrd = np.mod(rtrd, 1)
+    # rtrd = np.mod(rtrd, 1)
     return rtrd
 
 
@@ -312,9 +314,9 @@ def plot_retarder_response(
         rtrd=None, theta=None, title_str=None, finalize_figure=True):
     """Plot retarder transmission response.
 
-    Plot the intensity transmited through a variable retarder fixed at the given
-    orientation. This configuration is applicable to liquid crystal modulators
-    and Pockels cells.
+    Plot the intensity transmited through a variable retarder fixed at the
+    given orientation. This configuration is applicable to liquid crystal
+    modulators and Pockels cells.
     """
     in_svec = get_stokes_vec('hlp')
     pol_mmat = get_mueller_mat('pol')
@@ -335,7 +337,7 @@ def plot_retarder_response(
         plt.ylim([-0.1, 1.1])
         plt.xlim([np.min(rtrd_deg), np.max(rtrd_deg)])
         plt.grid('on')
-        #plt.xticks(np.arange(0, 361, 45))
+        # plt.xticks(np.arange(0, 361, 45))
         if title_str is None:
             title_str = 'Variable retarder response'
         plt.title(title_str)
@@ -344,7 +346,8 @@ def plot_retarder_response(
 
 
 def plot_pockels_response(
-        vctrl=None, theta=None, title_str=None, finalize_figure=True, with_qwp=False):
+        vctrl=None, theta=None, title_str=None, finalize_figure=True,
+        with_qwp=False):
     """Plot Pockels cell transmission response.
 
     Plot the intensity transmited through a variable retarder fixed at the given
@@ -377,7 +380,8 @@ def plot_pockels_response(
     add_y_marker(1)
     plt.grid('on')
     if title_str is None:
-        title_str = 'Pockels cell response (theta={:.0f} deg)'.format(theta/np.pi*180)
+        title_str = 'Pockels cell response (theta={:.0f} deg)'.format(
+            theta/np.pi*180)
     plt.title(title_str)
     plt.ylabel('Transmitted power, a.u.')
     plt.ylim([-0.1, 1.1])
