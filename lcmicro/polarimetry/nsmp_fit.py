@@ -14,6 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import least_squares
 from scipy.interpolate import interpn
+import scipy.ndimage as ndimg
 
 from lklib.string import get_human_val_str
 from lklib.util import handle_general_exception, unwrap_angle, ask_yesno, \
@@ -195,8 +196,7 @@ def pipo_c6v_fitfun(
         plt.pause(0.001)
 
     if plot_progress:
-        print("\nIter: " + print_par(['ampl', 'delta', 'zzz'], par) +
-              ", rmse={:.3f}".format(err))
+        print("\nIter: ", par, ", rmse={:.3f}".format(err))
     elif vlvl >= 1:
         print('.', end='', flush=True)
 
@@ -315,8 +315,8 @@ def fit_pipo_1point(
     elif fit_model == 'c6v':
         guess_par = [max_ampl, 0, 1]
         bounds = [
-            [0,             0,      1],
-            [max_ampl*100,  np.pi,  2]]
+            [0,             0,      0.1],
+            [max_ampl*100,  np.pi,  10]]
 
     if plot_progress:
         plt.figure(figsize=[12, 5])
@@ -377,6 +377,8 @@ def fit_pipo_1point(
                          pargrid[0][guess_inds[0]],
                          pargrid[1][guess_inds[1]]]
             diff_step = [0.001, 0.01/180*np.pi, 0.001]
+            # diff_step = [1, 1/180*np.pi, 0.1]
+            x_tol = [1, 1/180*np.pi, 0.1]
 
             if vlvl >= 1:
                 print("Guess values: A={:.1f}M, zzz={:.2f}, δ={:.1f}°".format(
@@ -441,12 +443,11 @@ def fit_pipo_1point(
         guess_par[guess_par_bound_check_hi] = bounds[1][guess_par_bound_check_hi]
 
     if plot_progress:
-        print("\nGuess parameters: "
-              + print_par(['ampl', 'delta', 'zzz'], guess_par))
+        print("\nGuess parameters: ", guess_par)
 
     fit_result = least_squares(
         fitfun, guess_par, args=(0, pipo_arr), diff_step=diff_step,
-        bounds=bounds, kwargs=fit_cfg)
+        bounds=bounds, xtol=0.01, kwargs=fit_cfg)
 
     fit_duration = time.time() - t_start
     fitdata = FitData(fit_result)
