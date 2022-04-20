@@ -40,6 +40,9 @@ try:
         pset_name=pset_name, output_type=output_type,
         img_type='ref_img',
         ref_img_name='mask_15_28_23_.375_.png')
+        
+    print("Exporting PIPO dataset as a pipo_arr.file...")
+    np.save('rtt_pipo_sim.npy', pipo_data)
 
     print("Exporting PIPO dataset as a multipage TIFF file...")
     convert_pipo_to_tiff(
