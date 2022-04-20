@@ -478,7 +478,7 @@ def fit_pipo_img(
         pipo_arr, fit_model='zcq', plot_progress=False,
         use_fit_accel=False, max_fit_pts=None,
         print_results=True, plot_results=True,
-        vlvl=1,
+        vlvl=1, resample=None,
         **kwargs):
     """Fit PIPO using image data."""
     t_start = time.time()
@@ -492,6 +492,20 @@ def fit_pipo_img(
     fcfg = ImgFitConfig()
     fcfg.set_fit_model(fit_model)
     fcfg.set_max_fit_pts(max_fit_pts)
+
+    if resample is not None:
+        if not isinstance(resample, list):
+            raise ValueError("'resample' has to be a list with two elements")
+        num_row, num_col = np.shape(pipo_arr)[0:2]
+        num_psa, num_psg = np.shape(pipo_arr)[2:4]
+        pipo_arr2 = np.ndarray([resample[0], resample[1], num_psa, num_psg])
+        resample_fac = np.min([resample[0]/num_row, resample[0]/num_col])
+        for ind_psg in range(num_psg):
+            for ind_psa in range(num_psa):
+                pipo_arr2[:, :, ind_psa, ind_psg] = ndimg.zoom(
+                    pipo_arr[:, :, ind_psa, ind_psg], resample_fac)
+
+        pipo_arr = pipo_arr2
 
     num_row, num_col = np.shape(pipo_arr)[0:2]
     fcfg.set_sz([num_row, num_col])
