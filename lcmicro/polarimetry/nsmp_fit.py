@@ -656,7 +656,7 @@ def fit_pipo(
     fit_accel = get_fit_accel(kwargs.get('fit_model'))[0]
 
     if show_input:
-        pipo_arr = load_pipo(file_name, binsz=None, cropsz=cropsz)
+        pipo_arr = load_pipo(file_name, binsz=binsz, cropsz=cropsz)
         print("Showing input image, close the figure window to continue...")
         plt.imshow(np.sum(np.sum(pipo_arr, 2), 2))
         plt.show()
