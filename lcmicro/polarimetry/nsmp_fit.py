@@ -628,9 +628,10 @@ def fit_pipo_img(
     imgfitdata = ImgFitData(fit_result)
     imgfitdata.cfg = fcfg
     imgfitdata.duration = elapsed_time
+    imgfitdata.save()
 
-    print("Saving intermediate fit data to 'fitdata.npy'...")
-    np.save('fitdata.npy', [imgfitdata])
+    # print("Saving intermediate fit data to 'fitdata.npy'...")
+    # np.save('fitdata.npy', [imgfitdata])
 
     if print_results:
         imgfitdata.print()

@@ -167,3 +167,8 @@ class ImgFitData(_FitData_Base):
                 return False
 
         return True
+
+    def save(self):
+        """Save fit data object to a npy file."""
+        print("Saving fit data to 'fitdata.npy'...")
+        np.save('fitdata.npy', [self])
