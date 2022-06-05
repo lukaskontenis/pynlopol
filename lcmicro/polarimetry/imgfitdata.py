@@ -49,7 +49,7 @@ class ImgFitData(_FitData_Base):
                 for ind_col in range(num_col):
                     if indpx == max_pts_to_fig:
                         break
-                    if mask[ind_row, ind_col] and self.result[indpx] is not None:
+                    if mask[ind_row, ind_col] and indpx < len(self.result) and self.result[indpx] is not None:
                         result1 = self.result[indpx]
                         self.par[par_name][ind_row, ind_col] = result1.get_par()[par_name]
                         indpx += 1
