@@ -125,6 +125,9 @@ def pipo_c6_fun(par):
 
     The equation is used in PIPONATOR for fitting with ampl, background and
     xyz. Background is not used here.
+
+    The Matlab equation string used in PIPONATOR is:
+    'A.*abs((sin(y+r).*sin(2.*(x+r)) + cos(y+r).*(1.*sin(x+r).^2 + Xzzz.*cos(x+r).^2) + 2.*Xxyz.*cos(x+r).*sin((x+r)-(y+r))).^2) + K'
     """
     # TODO: fix this
     psg_states = np.arange(0.0, 180.0, 22.5)/180*np.pi
