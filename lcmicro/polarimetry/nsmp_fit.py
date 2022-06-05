@@ -38,6 +38,16 @@ def get_default_fitaccel_filename():
     return 'fit_accel_c6v.npy'
 
 
+def get_default_fitfun_name(fit_model):
+    """Get the default fit function name."""
+    if fit_model == 'c6v':
+        return 'c6v_ag'
+    elif fit_model == 'zcq':
+        return 'nsmpsim'
+    else:
+        print("WARNING: no default fit function defined for fit model '{:}'".format(fit_model))
+
+
 def pipo_fitfun(
         par, xdata, data, fit_model='c6v',
         fit_accel=None,
@@ -404,12 +414,8 @@ def fit_pipo_1point(
     elif vlvl >= 2:
         print("Fitting data")
 
-    if fit_model == 'c6v':
-        if fitfun_name is None:
-            fitfun_name = 'c6v_ag'
-    elif fit_model == 'zcq':
-        if fitfun_name is None:
-            fitfun_name = 'nsmpsim'
+    if not fitfun_name:
+        fitfun_name = get_default_fitfun_name(fit_model)
 
     if fitfun_name == 'c6v_ag':
         fitfun = pipo_c6v_fitfun
@@ -492,6 +498,7 @@ def fit_pipo_img(
 
     fcfg = ImgFitConfig()
     fcfg.set_fit_model(fit_model)
+    fcfg.set_fitfun_name(kwargs.get('fit_fun_name', get_default_fitfun_name(fit_model)))
     fcfg.set_max_fit_pts(max_fit_pts)
 
     if resample is not None:
