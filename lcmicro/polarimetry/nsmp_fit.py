@@ -456,7 +456,7 @@ def fit_pipo_1point(
 
     fit_result = least_squares(
         fitfun, guess_par, args=(0, pipo_arr), diff_step=diff_step,
-        bounds=bounds, xtol=0.01, kwargs=fit_cfg)
+        bounds=bounds, xtol=0.0001, kwargs=fit_cfg)
 
     fit_duration = time.time() - t_start
     fitdata = FitData(fit_result)
