@@ -253,7 +253,7 @@ def get_fit_accel(fit_model='c6v'):
     elif fit_model == 'c6v':
         zzz_min = 1
         zzz_max = 2
-        num_zzz = 10
+        num_zzz = 20
         zzz_step = (zzz_max - zzz_min)/num_zzz
         zzz_arr = np.linspace(zzz_min, zzz_max, num_zzz)
 
