@@ -549,9 +549,14 @@ def fit_pipo_img(
     else:
         print("Fitting every point")
 
+    with_hist_prog_update = fcfg.get_opt('with_hist_prog_update') # True
+    hist_prog_update_period = fcfg.get_opt('hist_prog_update_period') # 10
+    fit_smooth_kernel_sz = fcfg.get_opt('fit_smooth_kernel_sz') # 2
+
     ind_fit = 0
     fit_result = []
     t_last_prog_update = time.time()
+    t_last_hist_prog_update = time.time()
     t_fit_start = time.time()
     for ind_row in range(num_row):
         for ind_col in range(num_col):
@@ -569,10 +574,30 @@ def fit_pipo_img(
                 msg = "Fitting point {:d} of {:d}. Elapsed time: {:s}, " \
                     "remaining {:s}".format(
                         ind_fit+1, num_pts_to_fit, get_human_val_str(elapsed_time, is_time=True), get_human_val_str(est_time_remaining, is_time=True))
-
                 print(msg)
 
-            pipo_arr1 = pipo_arr[ind_row, ind_col, :, :]
+            if with_hist_prog_update and t_now - t_last_hist_prog_update > hist_prog_update_period:
+                t_last_hist_prog_update = t_now
+                ax = kwargs.get('ratio_hist_ax', plt.gca())
+                ax.cla()
+                zzz_arr = [fr1.result.x[2] for fr1 in fit_result]
+                ax.hist(zzz_arr, bins=np.linspace(0.5, 3, 100))
+                ax.set_xlabel('R ratio')
+                ax.set_ylabel('Count')
+                ax.figure.canvas.draw()
+                ax.figure.canvas.show()
+                # plt.pause(0.001)
+
+            if fit_smooth_kernel_sz == 1:
+                pipo_arr1 = pipo_arr[ind_row, ind_col, :, :]
+            else:
+                ind_row_from = cap_in_range(np.ceil(ind_row - fit_smooth_kernel_sz/2).astype('int'), [0, num_row])
+                ind_row_to = cap_in_range(np.ceil(ind_row + fit_smooth_kernel_sz/2).astype('int'), [0, num_row])
+                ind_col_from = cap_in_range(np.ceil(ind_col - fit_smooth_kernel_sz/2).astype('int'), [0, num_col])
+                ind_col_to = cap_in_range(np.ceil(ind_col + fit_smooth_kernel_sz/2).astype('int'), [0, num_col])
+
+                pipo_arr1 = np.mean(np.mean(pipo_arr[ind_row_from:ind_row_to, ind_col_from:ind_col_to, :, :], 0), 0)
+
             try:
                 if vlvl >= 2:
                     vlvl1 = vlvl
