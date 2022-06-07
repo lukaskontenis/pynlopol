@@ -9,12 +9,8 @@ Copyright 2015-2020 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 import numpy as np
-from tabulate import tabulate
 
-from lklib.util import unwrap_angle
-from lklib.string import get_human_val_str
-
-from lcmicro.polarimetry.fitconfig import FitConfig
+from lkcom.string import get_human_val_str
 
 
 class _FitData_Base:

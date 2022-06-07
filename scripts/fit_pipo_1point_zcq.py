@@ -5,7 +5,7 @@ Fit a 'zcq' nonlinear SHG tensor model to a PIPO dataset.
 This script is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2021 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 # flake8: noqa
@@ -14,7 +14,7 @@ Contact: dse.ssd@gmail.com
 import sys
 import os
 
-from lklib.util import handle_general_exception
+from lkcom.util import handle_general_exception
 
 from lcmicro.dataio import get_microscopy_data_file_name
 from lcmicro.polarimetry.nsmp_fit import fit_pipo

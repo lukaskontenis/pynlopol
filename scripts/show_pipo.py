@@ -10,7 +10,7 @@ are summed into a single value.
 This script is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 # flake8: noqa
@@ -19,8 +19,8 @@ Contact: dse.ssd@gmail.com
 import sys
 import os
 
-from lklib.fileread import list_files_with_extension
-from lklib.util import handle_general_exception
+from lkcom.dataio import list_files_with_extension
+from lkcom.util import handle_general_exception
 
 from lcmicro.polarimetry.report import make_pipo_fig
 

@@ -6,7 +6,7 @@ This module contains NSMP fitting routines.
 This module is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2021 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 import time
@@ -16,10 +16,10 @@ from scipy.optimize import least_squares
 from scipy.interpolate import interpn
 import scipy.ndimage as ndimg
 
-from lklib.string import get_human_val_str
-from lklib.util import handle_general_exception, unwrap_angle, ask_yesno, \
-    find_closest
-from lklib.fileread import check_file_exists
+from lkcom.util import cap_in_range, handle_general_exception, unwrap_angle, \
+    ask_yesno, find_closest
+from lkcom.string import get_human_val_str
+from lkcom.dataio import check_file_exists
 
 from lcmicro.proc import load_pipo
 from lcmicro.polarimetry.report import plot_pipo_fit_img, plot_pipo_fit_1point
@@ -158,6 +158,8 @@ def pipo_c6_fun(par):
                 sin_ad[ind_psa]*sin_2gd +
                 cos_ad[ind_psa]*sin_gd2 +
                 zzz*cos_ad[ind_psa]*cos_gd2)
+
+
 
             # fit_data[ind_psa, ind_psg] = ampl*(
             #     np.sin(psa-delta)*np.sin(2*(psg-delta)) +

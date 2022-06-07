@@ -7,7 +7,7 @@ in nsmp_common.py.
 This module is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 
@@ -18,8 +18,8 @@ from lcmicro.polarimetry.class_chi import ClassChi
 from lcmicro.polarimetry.nsmp_common import get_pauli_matrix_arr, \
     get_gell_mann_matrix_arr
 
-from lklib.util import isnone, round_to
-from lklib.string import get_human_val_str
+from lkcom.util import isnone, round_to
+from lkcom.string import get_human_val_str
 
 
 def get_lab_chi(trunc_thr=None, **kwargs):

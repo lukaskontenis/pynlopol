@@ -7,7 +7,7 @@ SHG PIPO maps.
 This module is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 
@@ -17,9 +17,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import imageio
 
-from lklib.util import round_to
-from lklib.plot import export_figure
-from lklib.image import make_gif
+from lkcom.util import round_to
+from lkcom.plot import export_figure
+from lkcom.image import make_gif
 
 from lcmicro.polarimetry.gen_pol_state_sequence import gen_pol_state_sequence
 from lcmicro.polarimetry.nsmp import get_nsm_matrix

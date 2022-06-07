@@ -6,7 +6,7 @@ assuming all pixels have the same R=zzz/zxx ratio and in-plane angle delta.
 This script is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2021 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 # flake8: noqa
@@ -21,13 +21,11 @@ output_type = 'img'
 try:
     print("=== Rat-tail tendon PIPO image simulation ===")
 
-    import matplotlib.pyplot as plt
     import numpy as np
 
-    from lklib.util import handle_general_exception
-    from lklib.plot import export_figure
+    from lkcom.util import handle_general_exception
 
-    from lcmicro.polarimetry import simulate_pipo, plot_pipo
+    from lcmicro.polarimetry import simulate_pipo
     from lcmicro.proc import convert_pipo_to_tiff
 
     print("R = {:.2f}".format(zzz))
@@ -40,7 +38,7 @@ try:
         pset_name=pset_name, output_type=output_type,
         img_type='ref_img',
         ref_img_name='mask_15_28_23_.375_.png')
-        
+
     print("Exporting PIPO dataset as a pipo_arr.file...")
     np.save('rtt_pipo_sim.npy', pipo_data)
 

@@ -7,7 +7,7 @@ polarization state sequences for nonlinear PIPO and NSMP measurements.
 This module is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2021 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 

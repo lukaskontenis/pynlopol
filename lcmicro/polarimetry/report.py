@@ -5,7 +5,7 @@ This module contains plotting routines for linear and nonlinear polarimetry.
 This module is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 import os
@@ -13,10 +13,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-from lklib.util import unwrap_angle
-from lklib.plot import export_figure, imshow_ex
-from lklib.string import get_human_val_str
-from lklib.fileread import list_files_by_pattern, check_file_exists
+from lkcom.util import unwrap_angle
+from lkcom.plot import export_figure, imshow_ex
+from lkcom.string import get_human_val_str
+from lkcom.dataio import list_files_by_pattern, check_file_exists
 
 from lcmicro.proc import load_pipo
 from lcmicro.polarimetry.nsmp_common import get_num_states, \

@@ -12,7 +12,7 @@ Args:
 This script is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 # flake8: noqa
@@ -31,10 +31,9 @@ try:
     import sys
     import matplotlib.pyplot as plt
     import numpy as np
-    import imageio
 
-    from lklib.util import handle_general_exception
-    from lklib.plot import export_figure
+    from lkcom.util import handle_general_exception
+    from lkcom.plot import export_figure
 
     from lcmicro.polarimetry import simulate_pipo, plot_pipo
     from lcmicro.proc import convert_pipo_to_tiff

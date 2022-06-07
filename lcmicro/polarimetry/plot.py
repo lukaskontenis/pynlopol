@@ -6,14 +6,14 @@ This module contains NSMP plotting routines.
 This module is part of lcmicro, a Python library for nonlinear microscopy and
 polarimetry.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
-from lklib.plot import export_figure
+from lkcom.plot import export_figure
 
 from lcmicro.polarimetry.nsmp_common import get_num_states, \
     get_nsmp_state_order

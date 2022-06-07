@@ -12,7 +12,7 @@ import numpy as np
 from numpy import zeros, sin, cos, pi
 import matplotlib.pyplot as plt
 
-from lklib.plot import add_y_marker
+from lkcom.plot import add_y_marker
 
 
 def col_vec(arr):

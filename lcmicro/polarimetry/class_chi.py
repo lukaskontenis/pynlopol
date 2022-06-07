@@ -7,7 +7,7 @@ Note: a MATLAB version of this code is availble as part of NLPS in classChi.m.
 This Python version was first translated in 2020.11.21 using NLPS code from
 2017.07.12.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 # pep8: ignore=E202
