@@ -10,17 +10,38 @@ Contact: dse.ssd@gmail.com
 # flake8: noqa
 # pylint: skip-file"""
 
+import sys
+import os
 import numpy as np
 
+from lkcom.util import handle_general_exception
 from pynolmic.proc import load_pipo
 from pynolmic.dataio import get_microscopy_data_file_name
 
 from pynolpol.nsmp_fit import plot_pipo_fit_img
 
 
-fitdata = np.load('fitdata.npy', allow_pickle=True).item()
+print("=== PIPO fit plotter ===")
 
-file_name = get_microscopy_data_file_name()
-pipo_arr = load_pipo(file_name, binsz=None)
+file_name = None
+num_args = len(sys.argv)
+if num_args < 2:
+    file_name = get_microscopy_data_file_name()
+else:
+    file_name = sys.argv[1]
 
-plot_pipo_fit_img(fitdata, pipo_arr=pipo_arr)
+if file_name is None:
+    print("No input provided. Specify a file name using:")
+    print("\t" + os.path.basename(__file__) + " scan.dat")
+    print("\nOr drag a dat file on the script icon.\n")
+else:
+    try:
+        fitdata = np.load('fitdata.npy', allow_pickle=True).item()
+        pipo_arr = load_pipo(file_name, binsz=None)
+
+        plot_pipo_fit_img(fitdata, pipo_arr=pipo_arr)
+
+    except Exception:
+        handle_general_exception("Fitting failed")
+
+input("Pess any key to close this window...")
