@@ -1,2 +1,6 @@
+v0.9.1
+- Making sure pynolpol includes some test data
+- Improved README
+
 v0.9.0
 - Initial commit
