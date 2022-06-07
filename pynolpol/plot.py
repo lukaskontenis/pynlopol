@@ -12,7 +12,7 @@ from matplotlib.ticker import MaxNLocator
 
 from lkcom.plot import export_figure
 
-from pynolmic.nsmp_common import get_num_states, \
+from pynolpol.nsmp_common import get_num_states, \
     get_nsmp_state_order
 
 

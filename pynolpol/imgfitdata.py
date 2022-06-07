@@ -11,8 +11,8 @@ import numpy as np
 
 from lkcom.string import get_human_val_str, arr_summary_str
 
-from pynolmic.imgfitconfig import ImgFitConfig
-from pynolmic.fitdata_base import _FitData_Base
+from pynolpol.imgfitconfig import ImgFitConfig
+from pynolpol.fitdata_base import _FitData_Base
 
 
 class ImgFitData(_FitData_Base):

@@ -14,8 +14,8 @@ from tabulate import tabulate
 from lkcom.util import unwrap_angle
 from lkcom.string import get_human_val_str
 
-from pynolmic.fitconfig import FitConfig
-from pynolmic.fitdata_base import _FitData_Base
+from pynolpol.fitconfig import FitConfig
+from pynolpol.fitdata_base import _FitData_Base
 
 
 class FitData(_FitData_Base):

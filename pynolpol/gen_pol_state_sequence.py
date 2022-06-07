@@ -15,9 +15,9 @@ Contact: dse.ssd@gmail.com
 
 import numpy as np
 
-from pynolmic.polarimetry import get_stokes_vec, get_mueller_mat, \
+from pynolpol.polarimetry import get_stokes_vec, get_mueller_mat, \
     tensor_eq
-from pynolmic.nsmp_common import get_nsmp_state_order, \
+from pynolpol.nsmp_common import get_nsmp_state_order, \
     is_pset_pipo, get_num_states, validate_pset_name
 
 

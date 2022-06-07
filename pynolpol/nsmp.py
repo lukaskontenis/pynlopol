@@ -13,8 +13,8 @@ Contact: dse.ssd@gmail.com
 import time
 import numpy as np
 
-from pynolmic.class_chi import ClassChi
-from pynolmic.nsmp_common import get_pauli_matrix_arr, \
+from pynolpol.class_chi import ClassChi
+from pynolpol.nsmp_common import get_pauli_matrix_arr, \
     get_gell_mann_matrix_arr
 
 from lkcom.util import isnone, round_to

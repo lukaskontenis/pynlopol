@@ -17,12 +17,12 @@ from lkcom.util import cap_in_range, handle_general_exception, unwrap_angle, \
     ask_yesno, find_closest
 from lkcom.string import get_human_val_str
 from lkcom.dataio import check_file_exists
+from pynolmic.proc import load_pipo
 
-from pynolmicproc import load_pipo
-from pynolmic.report import plot_pipo_fit_img, plot_pipo_fit_1point
-from pynolmic.nsmp_sim import simulate_pipo
-from pynolmic.fitdata import FitData
-from pynolmic.imgfitdata import ImgFitData, ImgFitConfig
+from pynolpol.report import plot_pipo_fit_img, plot_pipo_fit_1point
+from pynolpol.nsmp_sim import simulate_pipo
+from pynolpol.fitdata import FitData
+from pynolpol.imgfitdata import ImgFitData, ImgFitConfig
 
 
 def get_default_fitdata_filename():

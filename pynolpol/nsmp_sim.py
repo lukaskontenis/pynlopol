@@ -20,11 +20,11 @@ from lkcom.util import round_to
 from lkcom.plot import export_figure
 from lkcom.image import make_gif
 
-from pynolmic.gen_pol_state_sequence import gen_pol_state_sequence
-from pynolmic.nsmp import get_nsm_matrix
-from pynolmic.nsmp_common import get_nsvec
-from pynolmic.polarimetry import get_stokes_vec, get_mueller_mat
-from pynolmic.plot import plot_pipo
+from pynolpol.gen_pol_state_sequence import gen_pol_state_sequence
+from pynolpol.nsmp import get_nsm_matrix
+from pynolpol.nsmp_common import get_nsvec
+from pynolpol.polarimetry import get_stokes_vec, get_mueller_mat
+from pynolpol.plot import plot_pipo
 
 
 def simulate_pipo_1point(trunc_thr=None, pset_name='pipo_8x8', **kwargs):

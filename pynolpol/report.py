@@ -11,17 +11,15 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 from lkcom.util import unwrap_angle
 from lkcom.plot import export_figure, imshow_ex
 from lkcom.string import get_human_val_str
 from lkcom.dataio import list_files_by_pattern, check_file_exists
 
-from pynolmicproc import load_pipo
-from pynolmic.nsmp_common import get_num_states, \
-    get_nsmp_state_order
-from pynolmic.nsmp_sim import simulate_pipo
-from pynolmic.imgfitdata import ImgFitData
+from pynolmic.proc import load_pipo
+from pynolpol.nsmp_common import get_num_states, get_nsmp_state_order
+from pynolpol.nsmp_sim import simulate_pipo
+from pynolpol.imgfitdata import ImgFitData
 
 
 def plot_pipo(
@@ -221,9 +219,16 @@ def plot_pipo_fit_img(
         title_str='Amplitude (counts)', with_hist=True)
 
     ax = plt.subplot(2, 2, 3)
-    imshow_ex(
-        delta, vmin=-90, vmax=90, ax=ax, logscale=False, cmap='hsv', title_str='delta (deg)',
-        with_hist=True, is_angle=True)
+    ones_arr = np.ones(np.shape(delta))
+    plt.quiver(
+        ones_arr, ones_arr, angles=np.flipud(delta)/np.pi*180, headaxislength=0,
+        headlength=0)
+    plt.axis('equal')
+    plt.axis('off')
+    plt.title('Orientation map')
+    # imshow_ex(
+    #     delta, vmin=-90, vmax=90, ax=ax, logscale=False, cmap='hsv', title_str='delta (deg)',
+    #     with_hist=True, is_angle=True)
 
     ax = plt.subplot(2, 2, 4)
     imshow_ex(
