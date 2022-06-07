@@ -13,3 +13,4 @@ scripts/PolStates.dat
 fitdata.npy
 test_data/
 scripts/PolStates*.dat
+scripts/*.zip

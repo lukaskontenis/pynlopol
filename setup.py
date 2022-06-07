@@ -18,7 +18,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'pynolmic>=0.9.0', 'lkcom>=0.2.0',
+        'numpy>=1.19.5', 'matplotlib>=3.3.3', 'scipy>=1.5.4', 'imageio>=2.9.0', 'pynolmic>=0.9.0', 'lkcom>=0.2.0',
     ],
     python_requires='>=3.6',
     data_files=[
