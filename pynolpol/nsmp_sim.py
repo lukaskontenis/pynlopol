@@ -1,11 +1,10 @@
 
-"""Nonlinear Stokes-Mueller polarimetry (NSMP).
+"""Nonlinear Stokes-Mueller polarimetry (NSMP) simulation.
 
 This module contains NSMP simulation routines to make static and animated
 SHG PIPO maps.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.w
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -21,11 +20,11 @@ from lkcom.util import round_to
 from lkcom.plot import export_figure
 from lkcom.image import make_gif
 
-from lcmicro.polarimetry.gen_pol_state_sequence import gen_pol_state_sequence
-from lcmicro.polarimetry.nsmp import get_nsm_matrix
-from lcmicro.polarimetry.nsmp_common import get_nsvec
-from lcmicro.polarimetry.polarimetry import get_stokes_vec, get_mueller_mat
-from lcmicro.polarimetry.plot import plot_pipo
+from pynolmic.gen_pol_state_sequence import gen_pol_state_sequence
+from pynolmic.nsmp import get_nsm_matrix
+from pynolmic.nsmp_common import get_nsvec
+from pynolmic.polarimetry import get_stokes_vec, get_mueller_mat
+from pynolmic.plot import plot_pipo
 
 
 def simulate_pipo_1point(trunc_thr=None, pset_name='pipo_8x8', **kwargs):

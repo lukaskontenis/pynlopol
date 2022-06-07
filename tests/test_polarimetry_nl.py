@@ -1,9 +1,9 @@
 
-"""lcmicro - a Python library for nonlinear microscopy and polarimetry.
+"""pynolpol - a Python library for nonlinear polarimetry.
 
 This file contains nonlinear polarimetry unit tests.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 import unittest
@@ -11,9 +11,9 @@ import pathlib
 
 import numpy as np
 
-import lcmicro.polarimetry as pol
-from lcmicro.polarimetry.polarimetry import tensor_eq
-from lcmicro.polarimetry.nsmp_sim import simulate_pipo
+import pynolpol as pol
+from pynolpol.polarimetry import tensor_eq
+from pynolpol.nsmp_sim import simulate_pipo
 
 
 class TestPolarimetry(unittest.TestCase):

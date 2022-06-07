@@ -31,8 +31,7 @@ any number of states N. The recommended set is 'pipo_8x8', anything less than
 'pipo_6x6' will likely fail to fit.
 
 
-This script is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -40,7 +39,7 @@ Contact: dse.ssd@gmail.com
 # flake8: noqa
 # pylint: skip-file
 
-from lcmicro.polarimetry import gen_pol_state_sequence, \
+from pynolpol import gen_pol_state_sequence, \
     verify_pol_state_sequence
 
 par = {

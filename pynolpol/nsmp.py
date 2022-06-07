@@ -4,8 +4,7 @@
 This module contains advanced NSMP routines, more common functions are
 in nsmp_common.py.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -14,8 +13,8 @@ Contact: dse.ssd@gmail.com
 import time
 import numpy as np
 
-from lcmicro.polarimetry.class_chi import ClassChi
-from lcmicro.polarimetry.nsmp_common import get_pauli_matrix_arr, \
+from pynolmic.class_chi import ClassChi
+from pynolmic.nsmp_common import get_pauli_matrix_arr, \
     get_gell_mann_matrix_arr
 
 from lkcom.util import isnone, round_to

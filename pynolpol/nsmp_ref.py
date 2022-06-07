@@ -1,10 +1,9 @@
-"""Nonlinear Stokes-Mueller polarimetry (NSMP).
+"""Nonlinear Stokes-Mueller polarimetry (NSMP) reference expressions.
 
-This module contains reference NSMP expressions for thesting that are derived by
+This module contains reference NSMP expressions for testing that are derived by
 hand and verified externaly.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com

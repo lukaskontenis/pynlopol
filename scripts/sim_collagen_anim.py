@@ -2,8 +2,7 @@
 
 Generate animated GIFs of SHG PIPO maps for collagen at varying delta and zzz.
 
-This script is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -11,11 +10,11 @@ Contact: dse.ssd@gmail.com
 # flake8: noqa
 # pylint: skip-file
 
-print("=== lcmicro ===")
+print("=== pynolpol ===")
 print("Generating PIPO map GIFs...")
 
 from lkcom.util import handle_general_exception
-from lcmicro.polarimetry import make_pipo_animation_delta, \
+from pynolpol import make_pipo_animation_delta, \
     make_pipo_animation_zzz
 
 try:

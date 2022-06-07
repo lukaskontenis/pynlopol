@@ -1,8 +1,7 @@
 
 """Linear polarimetry.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2020 Lukas Kontenis
 Contact: dse.ssd@gmail.com

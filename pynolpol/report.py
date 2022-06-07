@@ -2,8 +2,7 @@
 
 This module contains plotting routines for linear and nonlinear polarimetry.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -18,11 +17,11 @@ from lkcom.plot import export_figure, imshow_ex
 from lkcom.string import get_human_val_str
 from lkcom.dataio import list_files_by_pattern, check_file_exists
 
-from lcmicro.proc import load_pipo
-from lcmicro.polarimetry.nsmp_common import get_num_states, \
+from pynolmicproc import load_pipo
+from pynolmic.nsmp_common import get_num_states, \
     get_nsmp_state_order
-from lcmicro.polarimetry.nsmp_sim import simulate_pipo
-from lcmicro.polarimetry.imgfitdata import ImgFitData
+from pynolmic.nsmp_sim import simulate_pipo
+from pynolmic.imgfitdata import ImgFitData
 
 
 def plot_pipo(

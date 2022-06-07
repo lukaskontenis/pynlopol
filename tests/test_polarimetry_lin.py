@@ -1,16 +1,15 @@
 
-"""Linear polarimetry unit tests.
+"""pynolpol - a Python library for nonlinear polarimetry.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+Linear polarimetry tests.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 
 import unittest
 
-from lcmicro.polarimetry.polarimetry import col_vec, tensor_eq, get_eps, get_stokes_vec
+from pynolpol.polarimetry import col_vec, tensor_eq, get_eps, get_stokes_vec
 
 
 class TestPolarimetry(unittest.TestCase):

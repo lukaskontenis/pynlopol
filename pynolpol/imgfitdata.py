@@ -2,8 +2,7 @@
 
 This module contains the image fit data class.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -12,8 +11,8 @@ import numpy as np
 
 from lkcom.string import get_human_val_str, arr_summary_str
 
-from lcmicro.polarimetry.imgfitconfig import ImgFitConfig
-from lcmicro.polarimetry.fitdata_base import _FitData_Base
+from pynolmic.imgfitconfig import ImgFitConfig
+from pynolmic.fitdata_base import _FitData_Base
 
 
 class ImgFitData(_FitData_Base):

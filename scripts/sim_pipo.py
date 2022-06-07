@@ -9,8 +9,7 @@ Args:
     delta – sample in-plane orientation angle in degrees
     zzz – R-ratio (zzz/zxx) in the collagen case
 
-This script is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -25,7 +24,7 @@ pset_name = 'pipo_8x8'
 output_type = '1point'  # '1point' or 'img'
 
 try:
-    print("=== lcmicro ===")
+    print("=== pynolpol ===")
     print("Generating PIPO map...")
 
     import sys
@@ -34,10 +33,10 @@ try:
 
     from lkcom.util import handle_general_exception
     from lkcom.plot import export_figure
+    from pynolmic.proc import convert_pipo_to_tiff
 
-    from lcmicro.polarimetry import simulate_pipo, plot_pipo
-    from lcmicro.proc import convert_pipo_to_tiff
-
+    from pynolpol import simulate_pipo, plot_pipo
+    
     num_args = len(sys.argv)
     if num_args < 2:
         print("Running script with default values.\n")

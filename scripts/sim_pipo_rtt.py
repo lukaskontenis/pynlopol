@@ -3,8 +3,7 @@
 Simulate a rat-tail tendon PIPO dataset using a reference image as a mask and
 assuming all pixels have the same R=zzz/zxx ratio and in-plane angle delta.
 
-This script is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -24,9 +23,10 @@ try:
     import numpy as np
 
     from lkcom.util import handle_general_exception
+    from pynolmic.proc import convert_pipo_to_tiff
 
-    from lcmicro.polarimetry import simulate_pipo
-    from lcmicro.proc import convert_pipo_to_tiff
+    from pynolpol import simulate_pipo
+    
 
     print("R = {:.2f}".format(zzz))
     print("δ = {:.2f}°".format(delta/3.14*180))

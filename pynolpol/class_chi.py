@@ -1,7 +1,6 @@
-"""Nonlinear susceptibility tensor class.
+"""pynolpol - a Python library for nonlinear polarimetry.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+Nonlinear susceptibility tensor class.
 
 Note: a MATLAB version of this code is availble as part of NLPS in classChi.m.
 This Python version was first translated in 2020.11.21 using NLPS code from

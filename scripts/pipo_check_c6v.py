@@ -2,8 +2,7 @@
 
 Simulate C6v PIPO maps for several cases to showcase its behavior.
 
-This script is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2020 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -23,11 +22,12 @@ try:
     import sys
     import matplotlib.pyplot as plt
 
-    from lklib.util import handle_general_exception
-    from lklib.plot import export_figure
+    from lkcom.util import handle_general_exception
+    from lkcom.plot import export_figure
+    from pynolmic.proc import convert_pipo_to_tiff
 
-    from lcmicro.polarimetry import simulate_pipo, plot_pipo
-    from lcmicro.proc import convert_pipo_to_tiff
+    from pynolpol import simulate_pipo, plot_pipo
+    
 
     plt.figure(figsize=[11, 11])
 

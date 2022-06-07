@@ -2,8 +2,7 @@
 
 Verify a polarization state sequence for PIPO or NSMP polarimetry.
 
-This script is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -11,7 +10,7 @@ Contact: dse.ssd@gmail.com
 # flake8: noqa
 # pylint: skip-file
 
-from lcmicro.polarimetry import verify_pol_state_sequence
+from pynolpol import verify_pol_state_sequence
 
 par = {
     'file_name': 'PolStates.dat',

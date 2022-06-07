@@ -28,6 +28,9 @@ The SHG contraction prescription in Boyd's 1-based notation is:
 The THG contraction prescription is:
     jkl   111  222  333  112  122  113  133  223  233  123
     A     1    2    3    4    5    6    7    8    9    10
+    
+
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com

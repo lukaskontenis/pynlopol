@@ -1,11 +1,10 @@
 
-"""Nonlinear Stokes-Mueller polarimetry (NSMP).
+"""Nonlinear Stokes-Mueller polarimetry (NSMP) state verification.
 
 This file contains the verify_pol_state_sequence function to verify
 polarization state sequences for nonlinear PIPO and NSMP measurements.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -13,7 +12,7 @@ Contact: dse.ssd@gmail.com
 
 import numpy as np
 
-from lcmicro.polarimetry import gen_pol_state_sequence, get_stokes_vec, \
+from pynolmic import gen_pol_state_sequence, get_stokes_vec, \
     tensor_eq, get_nsmp_state_order, get_psgpsa_vector
 
 

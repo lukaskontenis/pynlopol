@@ -1,17 +1,16 @@
 
-"""Nonlinear Stokes-Mueller polarimetry (NSMP) figure generation tests.
+"""pynolpol - a Python library for nonlinear polarimetry.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+Nonlinear Stokes-Mueller polarimetry (NSMP) figure generation tests.
 
-Copyright 2015-2020 Lukas Kontenis
+Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 
 import unittest
 import numpy as np
 
-import lcmicro.polarimetry as pol
+import pynolpol as pol
 
 
 SHOW_FIG = False

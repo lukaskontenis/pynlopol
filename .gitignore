@@ -1,13 +1,10 @@
 build/
-lcmicro/__pycache__/
-lcmicro/*/__pycache__/
-lcmicro.egg-info/
+pynolpol/__pycache__/
 dist/
 docs/
 examples/
 *.png
 *.gif
-Design notes.txt
 todo.txt
 *.vscode/
 scripts/PolStates.dat

@@ -7,8 +7,7 @@ state sequences for nonlinear PIPO and NSMP measurements.
 Note: a similar MATLAB version of this code is availble as part of NLPS in
 GetPIPOStateSequence.m and GetSPIPOStateSequence.m.
 
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -16,9 +15,9 @@ Contact: dse.ssd@gmail.com
 
 import numpy as np
 
-from lcmicro.polarimetry.polarimetry import get_stokes_vec, get_mueller_mat, \
+from pynolmic.polarimetry import get_stokes_vec, get_mueller_mat, \
     tensor_eq
-from lcmicro.polarimetry.nsmp_common import get_nsmp_state_order, \
+from pynolmic.nsmp_common import get_nsmp_state_order, \
     is_pset_pipo, get_num_states, validate_pset_name
 
 

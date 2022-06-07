@@ -1,5 +1,5 @@
 
-"""lcmicro - a Python library for nonlinear microscopy and polarimetry.
+"""pynolpol - a Python library for nonlinear polarimetry.
 
 This file contains polarimetry fitting tests.
 
@@ -11,10 +11,10 @@ import pathlib
 
 import numpy as np
 
-import lcmicro.polarimetry as pol
-from lcmicro.polarimetry.polarimetry import tensor_eq
-from lcmicro.polarimetry.nsmp_sim import simulate_pipo
-from lcmicro.polarimetry.nsmp_fit import fit_pipo
+import pynolpol as pol
+from pynolpol.polarimetry import tensor_eq
+from pynolpol.nsmp_sim import simulate_pipo
+from pynolpol.nsmp_fit import fit_pipo
 
 
 class TestPolarimetryFit(unittest.TestCase):

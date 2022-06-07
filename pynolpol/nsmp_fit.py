@@ -1,10 +1,7 @@
 
-"""Nonlinear Stokes-Mueller polarimetry (NSMP).
+"""Nonlinear Stokes-Mueller polarimetry (NSMP) fit routines.
 
-This module contains NSMP fitting routines.
-
-This module is part of lcmicro, a Python library for nonlinear microscopy and
-polarimetry.
+This script is part of pynolpol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -21,11 +18,11 @@ from lkcom.util import cap_in_range, handle_general_exception, unwrap_angle, \
 from lkcom.string import get_human_val_str
 from lkcom.dataio import check_file_exists
 
-from lcmicro.proc import load_pipo
-from lcmicro.polarimetry.report import plot_pipo_fit_img, plot_pipo_fit_1point
-from lcmicro.polarimetry.nsmp_sim import simulate_pipo
-from lcmicro.polarimetry.fitdata import FitData
-from lcmicro.polarimetry.imgfitdata import ImgFitData, ImgFitConfig
+from pynolmicproc import load_pipo
+from pynolmic.report import plot_pipo_fit_img, plot_pipo_fit_1point
+from pynolmic.nsmp_sim import simulate_pipo
+from pynolmic.fitdata import FitData
+from pynolmic.imgfitdata import ImgFitData, ImgFitConfig
 
 
 def get_default_fitdata_filename():
