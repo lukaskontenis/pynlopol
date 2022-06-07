@@ -14,9 +14,9 @@ import tifffile
 
 from lkcom.string import change_extension
 from lkcom.dataio import list_files_with_extension, read_bin_file
+from pynolmic.cfgparse import read_cfg, parse_chan_idx
 
-from pynolmiccfgparse import read_cfg, parse_chan_idx
-from pynolmic.nsmp_common import get_num_states
+from pynolpol.nsmp_common import get_num_states
 
 
 def get_microscopy_data_file_name(file_name=None):
