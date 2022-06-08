@@ -1,3 +1,9 @@
+v0.9.2
+- pynolmic dep bump to v0.9.3
+- Flipped orientation map delta sign, hiding NaN values
+- Better fitting progress plotting: figure is now created if no axes are given,
+graceful fail if cannot update
+
 v0.9.1
 - Making sure pynolpol includes some test data
 - Improved README
