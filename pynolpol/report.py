@@ -221,7 +221,7 @@ def plot_pipo_fit_img(
     ax = plt.subplot(2, 2, 3)
     ones_arr = np.ones(np.shape(delta))
     plt.quiver(
-        ones_arr, ones_arr, angles=np.flipud(delta)/np.pi*180, headaxislength=0,
+        ones_arr, ones_arr, angles=-np.flipud(delta)/np.pi*180, headaxislength=0,
         headlength=0)
     plt.axis('equal')
     plt.axis('off')
