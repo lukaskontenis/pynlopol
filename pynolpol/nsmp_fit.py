@@ -17,8 +17,8 @@ from lkcom.util import cap_in_range, handle_general_exception, unwrap_angle, \
     ask_yesno, find_closest
 from lkcom.string import get_human_val_str
 from lkcom.dataio import check_file_exists
-from pynolmic.proc import load_pipo
 
+from pynolmic.proc import load_pipo
 from pynolpol.report import plot_pipo_fit_img, plot_pipo_fit_1point
 from pynolpol.nsmp_sim import simulate_pipo
 from pynolpol.fitdata import FitData
@@ -576,16 +576,20 @@ def fit_pipo_img(
                 print(msg)
 
             if with_hist_prog_update and t_now - t_last_hist_prog_update > hist_prog_update_period:
-                t_last_hist_prog_update = t_now
-                ax = kwargs.get('ratio_hist_ax', plt.gca())
-                ax.cla()
-                zzz_arr = [fr1.result.x[2] for fr1 in fit_result]
-                ax.hist(zzz_arr, bins=np.linspace(0.5, 3, 100))
-                ax.set_xlabel('R ratio')
-                ax.set_ylabel('Count')
-                ax.figure.canvas.draw()
-                ax.figure.canvas.show()
-                # plt.pause(0.001)
+                try:
+                    t_last_hist_prog_update = t_now
+                    ax = kwargs.get('ratio_hist_ax', plt.gca())
+                    ax.cla()
+                    zzz_arr = [fr1.result.x[2] for fr1 in fit_result]
+                    ax.hist(zzz_arr, bins=np.linspace(0.5, 3, 100))
+                    ax.set_xlabel('R ratio')
+                    ax.set_ylabel('Count')
+                    ax.figure.canvas.draw()
+                    ax.figure.canvas.show()
+                    plt.draw()
+                    plt.pause(0.001)
+                except Exception:
+                    print("Could not draw histogram update figure")
 
             if fit_smooth_kernel_sz == 1:
                 pipo_arr1 = pipo_arr[ind_row, ind_col, :, :]
