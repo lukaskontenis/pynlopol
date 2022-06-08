@@ -705,6 +705,39 @@ def fit_pipo(
     if pipo_arr is None:
         pipo_arr = load_pipo(file_name, binsz=binsz, cropsz=cropsz, **kwargs)
 
+    ratio_hist_ax = kwargs.get('ratio_hist_ax')
+    total_counts_ax = kwargs.get('total_counts_ax')
+    if ratio_hist_ax is None and total_counts_ax is None:
+        print("Fitting progress updates enabled, creating figure")
+        plt.clf()
+
+        try:
+            if total_counts_ax is None:
+                total_counts_ax = plt.subplot(1, 2, 1)
+                kwargs['total_counts_ax'] = total_counts_ax
+            else:
+                plt.sca(total_counts_ax)
+
+            plt.imshow(np.mean(np.mean(pipo_arr, 2), 2))
+            plt.title('Total counts')
+        except Exception:
+            handle_general_exception("Could not make total counts panel")
+
+        try:
+            if ratio_hist_ax is None:
+                ratio_hist_ax = plt.subplot(1, 2, 2)
+                kwargs['ratio_hist_ax'] = ratio_hist_ax
+            else:
+                plt.sca(ratio_hist_ax)
+
+            plt.xlim([0.5, 3])
+            plt.xlabel('R ratio')
+        except Exception:
+            handle_general_exception("Could not make histogram panel")
+
+        plt.draw()
+        plt.pause(0.001)
+
     if len(np.shape(pipo_arr)) == 4:
         return fit_pipo_img(pipo_arr, fit_accel=fit_accel, **kwargs)
     else:
