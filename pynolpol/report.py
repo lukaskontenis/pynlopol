@@ -220,6 +220,7 @@ def plot_pipo_fit_img(
 
     ax = plt.subplot(2, 2, 3)
     ones_arr = np.ones(np.shape(delta))
+    ones_arr[np.flipud(np.isnan(delta))] = np.nan
     plt.quiver(
         ones_arr, ones_arr, angles=-np.flipud(delta)/np.pi*180, headaxislength=0,
         headlength=0)
