@@ -1,4 +1,4 @@
-"""pynolpol - a Python library for nonlinear polarimetry.
+"""pynlopol - a Python library for nonlinear polarimetry.
 
 Nonlinear susceptibility tensor class.
 

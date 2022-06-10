@@ -2,7 +2,7 @@
 
 This module contains plotting routines for linear and nonlinear polarimetry.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -16,10 +16,10 @@ from lkcom.plot import export_figure, imshow_ex
 from lkcom.string import get_human_val_str
 from lkcom.dataio import list_files_by_pattern, check_file_exists
 
-from pynolmic.proc import load_pipo
-from pynolpol.nsmp_common import get_num_states, get_nsmp_state_order
-from pynolpol.nsmp_sim import simulate_pipo
-from pynolpol.imgfitdata import ImgFitData
+from pynlomic.proc import load_pipo
+from pynlopol.nsmp_common import get_num_states, get_nsmp_state_order
+from pynlopol.nsmp_sim import simulate_pipo
+from pynlopol.imgfitdata import ImgFitData
 
 
 def plot_pipo(

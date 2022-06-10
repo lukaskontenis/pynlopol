@@ -4,7 +4,7 @@
 This module contains NSMP simulation routines to make static and animated
 SHG PIPO maps.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.w
+This script is part of pynlopol, a Python library for nonlinear polarimetry.w
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -20,11 +20,11 @@ from lkcom.util import round_to
 from lkcom.plot import export_figure
 from lkcom.image import make_gif
 
-from pynolpol.gen_pol_state_sequence import gen_pol_state_sequence
-from pynolpol.nsmp import get_nsm_matrix
-from pynolpol.nsmp_common import get_nsvec
-from pynolpol.polarimetry import get_stokes_vec, get_mueller_mat
-from pynolpol.plot import plot_pipo
+from pynlopol.gen_pol_state_sequence import gen_pol_state_sequence
+from pynlopol.nsmp import get_nsm_matrix
+from pynlopol.nsmp_common import get_nsvec
+from pynlopol.polarimetry import get_stokes_vec, get_mueller_mat
+from pynlopol.plot import plot_pipo
 
 
 def simulate_pipo_1point(trunc_thr=None, pset_name='pipo_8x8', **kwargs):

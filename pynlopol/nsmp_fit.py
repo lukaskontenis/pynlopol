@@ -1,7 +1,7 @@
 
 """Nonlinear Stokes-Mueller polarimetry (NSMP) fit routines.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -18,11 +18,11 @@ from lkcom.util import cap_in_range, handle_general_exception, unwrap_angle, \
 from lkcom.string import get_human_val_str
 from lkcom.dataio import check_file_exists
 
-from pynolmic.proc import load_pipo
-from pynolpol.report import plot_pipo_fit_img, plot_pipo_fit_1point
-from pynolpol.nsmp_sim import simulate_pipo
-from pynolpol.fitdata import FitData
-from pynolpol.imgfitdata import ImgFitData, ImgFitConfig
+from pynlomic.proc import load_pipo
+from pynlopol.report import plot_pipo_fit_img, plot_pipo_fit_1point
+from pynlopol.nsmp_sim import simulate_pipo
+from pynlopol.fitdata import FitData
+from pynlopol.imgfitdata import ImgFitData, ImgFitConfig
 
 
 def get_default_fitdata_filename():

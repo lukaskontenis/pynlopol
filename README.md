@@ -1,17 +1,17 @@
-# pynolpol
+# pynlopol
 
 ## Overview
 
-pynolpol is a Python library for nonlinear microscopy and polarimetry.
+pynlopol is a Python library for nonlinear microscopy and polarimetry.
 
 ## Quick start
 
-pynolpol requires Python v3.6 or later. To run the scripts from the command
+pynlopol requires Python v3.6 or later. To run the scripts from the command
 line, Python has to be included in the system path.
 
-Install pynolpol using:
+Install pynlopol using:
 
-python -m pip install --upgrade --extra-index-url https://pypi.python.org/simple --index-url https://test.pypi.org/simple pynolpol
+python -m pip install --upgrade --extra-index-url https://pypi.python.org/simple --index-url https://test.pypi.org/simple pynlopol
 
 Your Python folder should now contain a PIPO analysis script under Scripts:
 fit_pipo_img.py

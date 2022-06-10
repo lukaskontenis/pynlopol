@@ -1,5 +1,5 @@
 
-"""pynolpol - a Python library for nonlinear polarimetry.
+"""pynlopol - a Python library for nonlinear polarimetry.
 
 Linear polarimetry tests.
 
@@ -9,7 +9,7 @@ Contact: dse.ssd@gmail.com
 
 import unittest
 
-from pynolpol.polarimetry import col_vec, tensor_eq, get_eps, get_stokes_vec
+from pynlopol.polarimetry import col_vec, tensor_eq, get_eps, get_stokes_vec
 
 
 class TestPolarimetry(unittest.TestCase):

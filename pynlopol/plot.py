@@ -1,7 +1,7 @@
 
 """NSMP plotting routines.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -12,7 +12,7 @@ from matplotlib.ticker import MaxNLocator
 
 from lkcom.plot import export_figure
 
-from pynolpol.nsmp_common import get_num_states, \
+from pynlopol.nsmp_common import get_num_states, \
     get_nsmp_state_order
 
 

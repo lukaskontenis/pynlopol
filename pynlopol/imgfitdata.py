@@ -2,7 +2,7 @@
 
 This module contains the image fit data class.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -11,8 +11,8 @@ import numpy as np
 
 from lkcom.string import get_human_val_str, arr_summary_str
 
-from pynolpol.imgfitconfig import ImgFitConfig
-from pynolpol.fitdata_base import _FitData_Base
+from pynlopol.imgfitconfig import ImgFitConfig
+from pynlopol.fitdata_base import _FitData_Base
 
 
 class ImgFitData(_FitData_Base):

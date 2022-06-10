@@ -4,7 +4,7 @@
 This module contains advanced NSMP routines, more common functions are
 in nsmp_common.py.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -13,8 +13,8 @@ Contact: dse.ssd@gmail.com
 import time
 import numpy as np
 
-from pynolpol.class_chi import ClassChi
-from pynolpol.nsmp_common import get_pauli_matrix_arr, \
+from pynlopol.class_chi import ClassChi
+from pynlopol.nsmp_common import get_pauli_matrix_arr, \
     get_gell_mann_matrix_arr
 
 from lkcom.util import isnone, round_to

@@ -7,7 +7,7 @@ respectively.
 The map shows one pixel per each input-output state combination, dataset images
 are summed into a single value.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -21,9 +21,9 @@ import os
 from lkcom.dataio import list_files_with_extension
 from lkcom.util import handle_general_exception
 
-from pynolpol.report import make_pipo_fig
+from pynlopol.report import make_pipo_fig
 
-print("=== pynolpol ===")
+print("=== pynlopol ===")
 print("Generating PIPO map...")
 
 file_name = None

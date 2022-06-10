@@ -1,6 +1,6 @@
 build/
-pynolpol/__pycache__/
-pynolpol.egg-info/
+pynlopol/__pycache__/
+pynlopol.egg-info/
 dist/
 docs/
 examples/

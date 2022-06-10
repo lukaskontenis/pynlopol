@@ -2,7 +2,7 @@
 
 Plot PIPO fit results from a fitdata.npy file.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -15,10 +15,10 @@ import os
 import numpy as np
 
 from lkcom.util import handle_general_exception
-from pynolmic.proc import load_pipo
-from pynolmic.dataio import get_microscopy_data_file_name
+from pynlomic.proc import load_pipo
+from pynlomic.dataio import get_microscopy_data_file_name
 
-from pynolpol.nsmp_fit import plot_pipo_fit_img
+from pynlopol.nsmp_fit import plot_pipo_fit_img
 
 
 print("=== PIPO fit plotter ===")

@@ -1,5 +1,5 @@
 
-"""pynolpol - a Python library for nonlinear polarimetry.
+"""pynlopol - a Python library for nonlinear polarimetry.
 
 Nonlinear Stokes-Mueller polarimetry (NSMP) figure generation tests.
 
@@ -10,7 +10,7 @@ Contact: dse.ssd@gmail.com
 import unittest
 import numpy as np
 
-import pynolpol as pol
+import pynlopol as pol
 
 
 SHOW_FIG = False

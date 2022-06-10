@@ -1,5 +1,5 @@
 
-"""pynolpol - a Python library for nonlinear polarimetry.
+"""pynlopol - a Python library for nonlinear polarimetry.
 
 This file contains polarimetry fitting tests.
 
@@ -11,10 +11,10 @@ import pathlib
 
 import numpy as np
 
-import pynolpol as pol
-from pynolpol.polarimetry import tensor_eq
-from pynolpol.nsmp_sim import simulate_pipo
-from pynolpol.nsmp_fit import fit_pipo
+import pynlopol as pol
+from pynlopol.polarimetry import tensor_eq
+from pynlopol.nsmp_sim import simulate_pipo
+from pynlopol.nsmp_fit import fit_pipo
 
 
 class TestPolarimetryFit(unittest.TestCase):

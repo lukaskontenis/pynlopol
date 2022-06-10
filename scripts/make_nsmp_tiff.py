@@ -2,7 +2,7 @@
 
 Convert an NSMP dataset to a multipage TIFF file for NLPS.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -14,9 +14,9 @@ import sys
 import os
 
 from lkcom.util import handle_general_exception
-from pynolmic.proc import convert_nsmp_to_tiff
+from pynlomic.proc import convert_nsmp_to_tiff
 
-from pynolpol.dataio import get_microscopy_data_file_name
+from pynlopol.dataio import get_microscopy_data_file_name
 
 print("=== NSMP TIFF converter ===")
 

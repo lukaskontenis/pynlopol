@@ -2,7 +2,7 @@
 
 This module contains the base class for FitData and ImgFitData.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2020 Lukas Kontenis
 Contact: dse.ssd@gmail.com

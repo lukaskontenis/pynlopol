@@ -3,7 +3,7 @@
 This module contains functions related to fitdata, which is the output data
 format for NSMP fitting functions found in nsmp_fit.py
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -14,8 +14,8 @@ from tabulate import tabulate
 from lkcom.util import unwrap_angle
 from lkcom.string import get_human_val_str
 
-from pynolpol.fitconfig import FitConfig
-from pynolpol.fitdata_base import _FitData_Base
+from pynlopol.fitconfig import FitConfig
+from pynlopol.fitdata_base import _FitData_Base
 
 
 class FitData(_FitData_Base):

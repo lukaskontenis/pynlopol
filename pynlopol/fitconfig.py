@@ -15,7 +15,7 @@ are:
     fit_model - name of the fit model, e.g. 'zcq', 'c6'
     fitfun_name - name of the fit model function
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com

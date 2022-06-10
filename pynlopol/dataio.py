@@ -1,6 +1,6 @@
 """Polarimetry data input/output functions.
 
-This script is part of pynolpol, a Python library for nonlinear polarimetry.
+This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
@@ -14,9 +14,9 @@ import tifffile
 
 from lkcom.string import change_extension
 from lkcom.dataio import list_files_with_extension, read_bin_file
-from pynolmic.cfgparse import read_cfg, parse_chan_idx
+from pynlomic.cfgparse import read_cfg, parse_chan_idx
 
-from pynolpol.nsmp_common import get_num_states
+from pynlopol.nsmp_common import get_num_states
 
 
 def get_microscopy_data_file_name(file_name=None):
