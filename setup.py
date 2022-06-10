@@ -5,20 +5,21 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pynlopol",
-    version="0.9.2",
+    version="1.0.0",
     author="Lukas Kontenis",
     author_email="dse.ssd@gmail.com",
     description="A Python library for nonlinear polarimetry.",
     long_description=long_description,
+    url="https://github.com/lukaskontenis/pynlopol",
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'numpy>=1.19.5', 'matplotlib>=3.3.3', 'scipy>=1.5.4', 'imageio>=2.9.0', 'pynlomic>=0.9.3', 'lkcom>=0.2.0',
+        'numpy>=1.19.5', 'matplotlib>=3.3.3', 'scipy>=1.5.4', 'imageio>=2.9.0', 'pynlomic>=1.0.1', 'lkcom>=0.2.0',
     ],
     python_requires='>=3.6',
     data_files=[

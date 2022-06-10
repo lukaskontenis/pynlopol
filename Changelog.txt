@@ -1,3 +1,8 @@
+v1.0.0
+- First public release
+- Changing name to pynlopol
+- Changing licence to BSD
+
 v0.9.2
 - pynolmic dep bump to v0.9.3
 - Flipped orientation map delta sign, hiding NaN values
