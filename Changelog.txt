@@ -1,3 +1,6 @@
+v1.0.1
+- Fixed installation command
+
 v1.0.0
 - First public release
 - Changing name to pynlopol

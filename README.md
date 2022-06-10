@@ -11,7 +11,7 @@ line, Python has to be included in the system path.
 
 Install pynlopol using:
 
-python -m pip install --upgrade --extra-index-url https://pypi.python.org/simple --index-url https://test.pypi.org/simple pynlopol
+python -m pip install pynlopol
 
 Your Python folder should now contain a PIPO analysis script under Scripts:
 fit_pipo_img.py
