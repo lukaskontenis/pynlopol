@@ -30,7 +30,7 @@ sim_par = {
     'sample_name': 'c6v',
     'nlorder': 3,
     'delta': 0/180*3.14,
-    'zzzz': 7,
+    'zzzz': 10,
     'xxxx': 5,
     'zzxx': 3
 }
