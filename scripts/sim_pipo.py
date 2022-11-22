@@ -28,7 +28,7 @@ sim_par = {
 # THG C6v
 sim_par = {
     'sample_name': 'c6v',
-    'nlorder': 2,
+    'nlorder': 3,
     'delta': 0/180*3.14,
     'zzzz': 7,
     'xxxx': 5,
