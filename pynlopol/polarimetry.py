@@ -26,7 +26,7 @@ def get_eps():
     return np.finfo('float64').eps
 
 
-def tensor_eq(tns1, tns2, thr=get_eps()):
+def tensor_eq(tns1, tns2, thr=get_eps(), debug=False):
     """Check if two tensors are equal within floating point precision.
 
     Works for vectors and matrices too.
@@ -35,6 +35,16 @@ def tensor_eq(tns1, tns2, thr=get_eps()):
         tns1 = np.array(tns1)
     if isinstance(tns2, list):
         tns2 = np.array(tns2)
+
+    if debug:
+        import matplotlib.pyplot as plt
+        plt.subplot(3, 1, 1)
+        plt.imshow(tns1/np.max(tns1), vmin=-1, vmax=1)
+        plt.subplot(3, 1, 2)
+        plt.imshow(tns2/np.max(tns2), vmin=-1, vmax=1)
+        plt.subplot(3, 1, 3)
+        plt.imshow((tns1 - tns2)/np.max(abs(tns1 - tns2)), vmin=-1, vmax=1)
+
     return (np.abs(tns1 - tns2) <= thr).all()
 
 

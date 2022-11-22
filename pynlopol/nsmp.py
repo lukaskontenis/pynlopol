@@ -31,7 +31,7 @@ def get_lab_chi(trunc_thr=None, **kwargs):
 
 
 def get_nsm_matrix(
-        delta=0, alpha=0, theta=0, nlorder=None, sample_par=None,
+        delta=0, alpha=0, theta=0, sample_par=None,
         cmplx_r=0, algorithm=None, eff_chi=0, trunc_thr=None, **kwargs):
     """Get the nonlinear Stokes-Mueller matrix.
 
@@ -69,8 +69,7 @@ def get_nsm_matrix(
     chi.zero_small_values()
 
     # Get the nonlinear order
-    if isnone(nlorder):
-        nlorder = chi.get_nlorder()
+    nlorder = chi.get_nlorder()
 
     num_rows = 4
     if nlorder == 2:
@@ -134,7 +133,7 @@ def get_nsm_matrix(
         # Since the nonlinear Mueller matrix calculation is performed using
         # the generalized NSMP framework, the primary axis should be Z. For
         # legacy uses it can be changed to X, but this may or may not work.
-        chimat = chi.get_ms_contraction(primary_axis='x')
+        chimat = chi.get_ms_contraction(primary_axis=kwargs.get('primary_axis', 'z'))
 
         for ind_t in range(num_rows):
             for ind_N in range(num_col):

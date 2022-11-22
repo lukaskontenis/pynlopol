@@ -4,6 +4,26 @@
 This module contains common NSMP routines, more advanced functions are
 in nsmp.py.
 
+A note on the coordinate system differences throughout the NSMP theory papers
+and this code. During the development of the NSMP theory there was a change of
+the coordinate system, which introduced quite a bit of confusion. The DSMP
+paper used a coordinate system definition where the X axis was sort of the
+primary one, indexed first, yet the frame of reference angles were computed
+from the Z axis as usual. This setup also resulted in the coordinate system
+being left-handed. The TSMP paper and the generalized NSMP paper that followed
+used the Z axis as primary throughout and the coordinate system was right
+handed. The NSMP theory covers the DSMP case and the inconsistencies could be
+removed by sticking to NSMP for SHG and THG cases. However, much of the orginal
+NLPS matlab code was written when only DSMP was available and a lot of the
+ideas were borrowed into this library. As a result the pynlopol is alos a
+mixture of DSMP and NSMP coordinate systems. While confusing the systems are
+internaly consistent and give the correct answers. Most porblems occur when a
+certain order of components is assumed or functions where the different
+theories are not handled properly are mixed.
+
+DSMP paper: Samim et al., J. Opt. Soc. Am. B 32, 451 (2015)
+NSMP paper: Samim et al., Phys. Rev. A 93, 033839 (2016)
+
 This script is part of pynlopol, a Python library for nonlinear polarimetry.
 
 Copyright 2015-2022 Lukas Kontenis
@@ -93,9 +113,10 @@ def get_gell_mann_matrix_arr(nlproc):
     if nlproc == 'shg':
         gmmat_arr = np.zeros([3, 3, 9], dtype=complex)
     elif nlproc == 'thg':
-        gmmat_arr = np.zeros([3, 3, 16], dtype=complex)
+        gmmat_arr = np.zeros([4, 4, 16], dtype=complex)
     else:
-        raise(Exception("No Gell-Mann matrices defined for {:s}".format(nlproc)))
+        raise Exception("No Gell-Mann matrices defined for {:s}".format(
+            nlproc))
 
     for ind in range(gmmat_arr.shape[2]):
         gmmat_arr[:, :, ind] = get_gell_mann_matrix(nlproc, ind+1)
@@ -288,9 +309,34 @@ def get_nsvec(svec, nlord=2):
         nsvec[6] = -s2 * s3
         nsvec[7] = s3 * (s1 + s0)
         nsvec[8] = s3 * (s1 - s0)
+
+    elif nlord == 3:
+        nsvec = np.ndarray([16, 1])
+
+        sq2 = np.sqrt(2)
+        sq3 = np.sqrt(3)
+        sq6 = np.sqrt(6)
+        nsvec[0]  = sq2*s0*(5*s0**2 - 3*s1**2)
+        nsvec[1]  = sq6*(-4/3*s0**3 + 3*s0**2*s1 + 2*s0*s1**2 - 3*s1**3)
+        nsvec[2]  = sq3*(-8/3*s0**3 - 3*s0**2*s1 + 4*s0*s1**2 + 3*s1**3)
+        nsvec[3]  = s1*(3*s0**2 + s1**2)
+        nsvec[4]  = s2*(s2**2 - 3*s3**2)
+        nsvec[5]  = 3*(s0 - s1)*(s2**2 - s3**2)
+        nsvec[6]  = 9*s2*(s2**2 + s3**2)
+        nsvec[7]  = 3*s2*(s0 - s1)**2
+        nsvec[8]  = 3*s2*(s0 + s1)**2
+        nsvec[9]  = 3*(s0 + s1)*(s2**2 - s3**2)
+        nsvec[10] = s3*(3*s2**2 - s3**2)
+        nsvec[11] = -6*s2*s3*(s0 - s1)
+        nsvec[12] = 9*s3*(s2**2 + s3**2)
+        nsvec[13] = -3*s3*(s0 - s1)**2
+        nsvec[14] = 3*s3*(s0 + s1)**2
+        nsvec[15] = 6*s2*s3 *(s0 + s1)
+
+        nsvec = nsvec/4
+
     else:
-        print("Only 2-nd order NSMP is implemented")
-        nsvec = None
+        raise RuntimeError("Only 2-nd and 3-rd order NSMP is implemented")
 
     return nsvec
 

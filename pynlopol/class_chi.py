@@ -36,7 +36,7 @@ class ClassChi:
 
     primary_axis = None  # Primary axis of the tensor
 
-    def __init__(self, symmetry_str=None, verbosity=0, **kwargs):
+    def __init__(self, symmetry_str=None, verbosity=0, nlorder=None, **kwargs):
         """Contruct a chi tensor."""
         if symmetry_str is None:
             print("No symmetry information given.")
@@ -44,10 +44,13 @@ class ClassChi:
 
         self.symmetry_str = symmetry_str
 
-        if verbosity >= 1:
-            print("Assuming 2-nd order tensor")
+        if nlorder is None:
+            self.nlorder = 2
+            if verbosity >= 1:
+                print("Assuming 2-nd order tensor")
+        else:
+            self.nlorder = nlorder
 
-        self.nlorder = 2
         self.rank = 2
 
         if symmetry_str == 'nop':
@@ -128,9 +131,28 @@ class ClassChi:
                     [zxx, zxx, zzz,   0,    0, 0]])
 
                 self.expand()
+            elif self.nlorder == 3:
+                # chi(3) C6v, THG with Kleinman symmetry
+                # Ratio definitions from Tokarz2014
+                # z is along axis of symmetry
+                # R1 = zzxx/xxxx, R2 = zzzz/xxxx
+                zzzz = kwargs.get('zzzz', 2)
+                zzxx = kwargs.get('zzxx', 2)
+                xxxx = kwargs.get('xxxx', 1)
+
+                self.chid = np.array([
+                    #   1,   2,    3,      4,      5,    6,    7,    8,    9, 10
+                    [xxxx,   0,    0,      0, xxxx/3,    0, zzxx,    0,    0,  0],
+                    [   0,xxxx,    0, xxxx/3,      0,    0,    0,    0, zzxx,  0],
+                    [   0,   0, zzzz,      0,      0, zzxx,    0, zzxx,    0,  0]])
+
+                self.expand()
+            else:
+                raise Exception("No C6v tensor definition for "
+                                "order {:}".format(self.nlorder))
 
         else:
-            raise(Exception('Unrecognized symmetry string ' + symmetry_str))
+            raise Exception('Unrecognized symmetry string ' + symmetry_str)
 
     def expand(self):
         """Expand the tensor from contracted form."""
@@ -161,7 +183,7 @@ class ClassChi:
             zzz, zxx, zzx
             xzz, xxx, xxz
 
-        The z, x components for THG in x-primary MS notation  are:
+        The z, x components for THG in x-primary MS notation are:
             xxxx, xzzz, xxxz, xxzz
             zxxx, zzzz, zzxx, zzzx
 
@@ -188,22 +210,38 @@ class ClassChi:
                     [self.chi[2, 2, 2, 2], self.chi[2, 0, 0, 0], self.chi[2, 2, 2, 0], self.chi[2, 2, 0, 0]],
                     [self.chi[0, 2, 2, 2], self.chi[0, 0, 0, 0], self.chi[0, 0, 2, 2], self.chi[0, 0, 0, 2]]])
         else:
-            raise(Exception("Unedfined nonlinear order {:d}".format(self.nlorder)))
+            raise RuntimeError("Unedfined nonlinear order {:d}".format(
+                self.nlorder))
 
     def get_lab_chi(self):
-        """Return laboratory-frame chi chomponents.
+        """Return laboratory-frame chi(n) components.
 
-        The components are returned in NSMP order:
-            ZXX, ZZZ, ZXZ, XXX, XZZ, XXZ
+        See note in nsmp_common.py regarding component 2-nd and 3-rd order
+        cases.
         """
-        chi_ms = self.get_ms_contraction(primary_axis='z')
-        return np.array([
-            chi_ms[0, 1],
-            chi_ms[0, 0],
-            chi_ms[0, 2],
-            chi_ms[1, 1],
-            chi_ms[1, 0],
-            chi_ms[1, 2]])
+        chi_vec = self.get_ms_contraction(primary_axis='z')
+        if self.get_nlorder() == 2:
+            # Components are returned in NSMP order:
+            #   ZXX, ZZZ, ZXZ, XXX, XZZ, XXZ
+            return np.array([
+                chi_vec[0, 1],
+                chi_vec[0, 0],
+                chi_vec[0, 2],
+                chi_vec[1, 1],
+                chi_vec[1, 0],
+                chi_vec[1, 2]])
+        elif self.get_nlorder() == 3:
+            # Components are returned in NSMP order:
+            #   ZZZZ, ZXXX, ZZZX, ZZXX, XZZZ, XXXX, XXZZ, XXXZ
+            return np.array([
+                chi_vec[0, 0],
+                chi_vec[0, 1],
+                chi_vec[0, 2],
+                chi_vec[0, 3],
+                chi_vec[1, 0],
+                chi_vec[1, 1],
+                chi_vec[1, 2],
+                chi_vec[1, 3]])
 
     def get_nlorder(self):
         """Return the nonlinear order for the tensor."""

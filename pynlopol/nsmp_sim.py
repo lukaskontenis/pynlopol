@@ -63,7 +63,7 @@ def simulate_pipo_1point(trunc_thr=None, pset_name='pipo_8x8', **kwargs):
         # an addition check and can be used for additional simulation options,
         # e.g. diattenuation.
         svec_in = np.dot(mmat_psg, svec_laser)
-        nsvec_in = get_nsvec(svec_in, nlord=2)
+        nsvec_in = get_nsvec(svec_in, nlord=kwargs.get('nlorder', 2))
 
         # SHG Stokes vector after sample
         svec_sample = np.dot(nmmat, nsvec_in)

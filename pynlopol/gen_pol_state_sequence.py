@@ -163,7 +163,7 @@ def gen_pol_state_sequence(
         svec_det = mmat_pol.dot(mmat_qwp.dot(mmat_hwp.dot(svec_in)))
 
         if not tensor_eq(svec_det, get_stokes_vec(output_state)):
-            print("PSA state {:d} is not {:s}", ind_psg, psg_states[ind_psg])
+            print("PSA state {:d} is not {:s}".format(ind_psa, psg_states[ind_psa]))
 
     # === Generate state sequence ===
 

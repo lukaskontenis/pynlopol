@@ -17,10 +17,28 @@ Contact: dse.ssd@gmail.com
 # flake8: noqa
 # pylint: skip-file
 
-sample_name = 'zcq'
-delta = 0/180*3.14
-zzz = 1.5
-pset_name = 'pipo_8x8'
+# == Example arguments ==
+# Collagen SHG C6v
+sim_par = {
+    'sample_name': 'collagen',
+    'delta': 0/180*3.14,
+    'zzz': 1.5
+}
+
+# THG C6v
+sim_par = {
+    'sample_name': 'c6v',
+    'nlorder': 2,
+    'delta': 0/180*3.14,
+    'zzzz': 7,
+    'xxxx': 5,
+    'zzxx': 3
+}
+
+# Polarization state set, use, for example:
+#   'pipo_8x8' or 'pipo_9x9' for typical microscope scan data
+#   'pipo_100x100' for a nicer figure to look at
+pset_name = 'pipo_100x100'
 output_type = '1point'  # '1point' or 'img'
 
 try:
@@ -35,8 +53,10 @@ try:
     from lkcom.plot import export_figure
     from pynlomic.proc import convert_pipo_to_tiff
 
-    from pynlopol import simulate_pipo, plot_pipo
-    
+    from pynlopol.nsmp_sim import simulate_pipo, plot_pipo
+
+    sample_name = sim_par.get('sample_name')
+
     num_args = len(sys.argv)
     if num_args < 2:
         print("Running script with default values.\n")
@@ -89,8 +109,12 @@ try:
         symmetry_str = 'c6v'
     elif sample_name == 'zcq':
         symmetry_str = 'd3'
+    elif sample_name == 'c6v':
+        symmetry_str = 'c6v'
     else:
         raise(Exception("Unsupported sample name '{:s}'".format(sample_name)))
+
+    delta = sim_par.get('delta')
 
     print("\nSample name: " + sample_name)
     print("Delta: {:.2f}°".format(delta))
@@ -99,10 +123,10 @@ try:
 
     print("Generating map...")
 
-    pipo_data = simulate_pipo(
-        symmetry_str=symmetry_str, delta=delta, zzz=zzz,
+    pipo_data = simulate_pipo(**sim_par,
         pset_name=pset_name, output_type=output_type)
 
+    title_str = ''
     if sample_name == 'collagen':
         title_str = "Collagen R={:.2f}".format(zzz) + " PIPO map, δ={:.0f}°".format(delta/3.14*180)
     elif sample_name == 'zcq':
