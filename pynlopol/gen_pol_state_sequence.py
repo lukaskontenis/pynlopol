@@ -65,7 +65,7 @@ def gen_pol_state_sequence(
     # QWP fast axis is aligned with the HWP FA for all LP states.
 
     if is_pset_pipo(pset_name):
-        psg_states, psa_states = get_nsmp_state_order(pset_name)
+        psg_states, psa_states = get_nsmp_state_order(pset_name, **kwargs)
         num_psg_states, num_psa_states = get_num_states(pset_name)
 
         if output_state == 'hlp':
@@ -75,10 +75,16 @@ def gen_pol_state_sequence(
             psa_hwp_ofs = 45
             psa_pol = 90 / 180 * np.pi
 
-        psg_hwp = np.linspace(0, 180, num_psg_states+1)[:-1]/2 / 180*np.pi
-        psg_qwp = np.linspace(0, 180, num_psg_states+1)[:-1] / 180 *np.pi
+        if kwargs.get('duplicate_pipo_states'):
+            psg_hwp = np.linspace(0, 180, num_psg_states)/2 / 180*np.pi
+            psg_qwp = np.linspace(0, 180, num_psg_states) / 180 *np.pi
 
-        psa_hwp = (np.linspace(0, 180, num_psa_states+1)[:-1]/2 + psa_hwp_ofs)/ 180*np.pi
+            psa_hwp = (np.linspace(0, 180, num_psa_states)/2 + psa_hwp_ofs)/ 180*np.pi
+        else:
+            psg_hwp = np.linspace(0, 180, num_psg_states+1)[:-1]/2 / 180*np.pi
+            psg_qwp = np.linspace(0, 180, num_psg_states+1)[:-1] / 180 *np.pi
+
+            psa_hwp = (np.linspace(0, 180, num_psa_states+1)[:-1]/2 + psa_hwp_ofs)/ 180*np.pi
 
         # For the PSA in PIPO mode the incident state is transformed to
         # the output state after the HWP. The QWP then does nothing.

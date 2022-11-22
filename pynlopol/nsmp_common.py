@@ -317,18 +317,24 @@ def get_num_states(pset_name):
     return num_psg_states, num_psa_states
 
 
-def get_nsmp_state_order(pset_name):
+def get_nsmp_state_order(pset_name, duplicate_pipo_states=False, **kwargs):
     """ Get the state order for an NSMP measurement.
 
     Args:
         pset_name - Polarimetric state set name
+        duplicate_pipo_states - Dupliate the initial and final states in a PIPO
+            set, i.e. the PSG and PSA angles start and stop at the same value.
     """
     validate_pset_name(pset_name)
 
     if is_pset_pipo(pset_name):
         num_psg_states, num_psa_states = get_num_states(pset_name)
-        psg_states = [str(x) for x in np.linspace(0, 180, num_psg_states+1)[:-1]]
-        psa_states = [str(x) for x in np.linspace(0, 180, num_psa_states+1)[:-1]]
+        if duplicate_pipo_states:
+            psg_states = [str(x) for x in np.linspace(0, 180, num_psg_states)]
+            psa_states = [str(x) for x in np.linspace(0, 180, num_psa_states)]
+        else:
+            psg_states = [str(x) for x in np.linspace(0, 180, num_psg_states+1)[:-1]]
+            psa_states = [str(x) for x in np.linspace(0, 180, num_psa_states+1)[:-1]]
 
     elif pset_name == 'shg_nsmp':
         psg_states = ['hlp', 'vlp', '+45', '-45', 'rcp', 'lcp', '-22.5', 'rep',
