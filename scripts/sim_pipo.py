@@ -124,7 +124,7 @@ try:
 
     print("Generating map...")
 
-    pipo_data = simulate_pipo(**sim_par,
+    pipo_data = simulate_pipo(**sim_par, symmetry_str=symmetry_str,
         pset_name=pset_name, output_type=output_type)
 
     title_str = ''
