@@ -132,6 +132,9 @@ try:
         title_str = "Collagen R={:.2f}".format(zzz) + " PIPO map, δ={:.0f}°".format(delta/3.14*180)
     elif sample_name == 'zcq':
         title_str = "Z-cut quartz PIPO map, δ={:.0f}°".format(delta/3.14*180)
+    elif sample_name == 'c6v':
+        title_str = "N={:} C6v PIPO map, zzzz={:.1f}, xxxx={:.1f}, zzxx={:.1f}, δ={:.0f}°".format(
+            sim_par.get('nlorder'), sim_par.get('zzzz'), sim_par.get('xxxx'), sim_par.get('zzxx'), sim_par.get('delta')/3.14*180)
 
     if len(np.shape(pipo_data)) == 2:
         plot_pipo(pipo_data, title_str=title_str, show_fig=False, pset_name=pset_name)
