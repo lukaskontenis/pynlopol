@@ -1,3 +1,10 @@
+v1.0.2
+- Added preliminary THG C6v support. Functional correctness is not yet fully validated, but PIPO bubbles look okay, and some tests against NLPS code pass.
+- Added better tracking of DSMP/NSMP coordinate change instances and added
+warnings to inform user
+- Added support for duplicated PIPO state generation to better match PIPONATOR
+data and NLPS.
+
 v1.0.1
 - Fixed installation command
 
