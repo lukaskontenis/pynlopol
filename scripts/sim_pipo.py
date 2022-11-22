@@ -19,11 +19,12 @@ Contact: dse.ssd@gmail.com
 
 # == Example arguments ==
 # Collagen SHG C6v
-sim_par = {
-    'sample_name': 'collagen',
-    'delta': 0/180*3.14,
-    'zzz': 1.5
-}
+# sim_par = {
+#     'sample_name': 'collagen',
+#     'delta': 0/180*3.14,
+#     'nlorder': 2,
+#     'zzz': 1.5
+# }
 
 # THG C6v
 sim_par = {
