@@ -1,3 +1,7 @@
+v1.0.3
+- Fixed incorrect NL order and symmetry string passing in sim_pipo fix
+- PIPO simulation now has a nicer figure title for THG C6v
+
 v1.0.2
 - Added preliminary THG C6v support. Functional correctness is not yet fully validated, but PIPO bubbles look okay, and some tests against NLPS code pass.
 - Added better tracking of DSMP/NSMP coordinate change instances and added
