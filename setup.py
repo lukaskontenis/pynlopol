@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pynlopol",
-    version="1.0.3",
+    version="1.0.4",
     author="Lukas Kontenis",
     author_email="dse.ssd@gmail.com",
     description="A Python library for nonlinear polarimetry.",
@@ -19,7 +19,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'numpy>=1.19.5', 'matplotlib>=3.3.3', 'scipy>=1.5.4', 'imageio>=2.9.0', 'pynlomic>=1.0.1', 'lkcom>=0.2.0',
+        'numpy>=1.19.5', 'matplotlib>=3.3.3', 'scipy>=1.5.4', 'imageio>=2.9.0', 'pynlomic>=1.0.1', 'lkcom>=0.3.0',
     ],
     python_requires='>=3.6',
     data_files=[
@@ -34,6 +34,7 @@ setuptools.setup(
         'scripts/plot_piponator_fit.py',
         'scripts/show_pipo.py',
         'scripts/sim_collagen_anim.py',
+        'scripts/sim_thg_c6v_anim.py',
         'scripts/sim_pipo.py',
         'scripts/sim_pipo_collagen.bat',
         'scripts/sim_pipo_collagen_hr.bat',

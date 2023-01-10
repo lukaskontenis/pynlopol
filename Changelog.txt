@@ -1,3 +1,10 @@
+v1.0.4
+- Fix: THG C6v tensor generation should now work with delta
+- Fixed 3rd order tensor rotation code
+- New print() method for ChiClass
+- Nicer PIPO bubble contourf plotting
+- Added PIPO bubble animations for THG C6v
+
 v1.0.3
 - Fixed incorrect NL order and symmetry string passing in sim_pipo fix
 - PIPO simulation now has a nicer figure title for THG C6v
