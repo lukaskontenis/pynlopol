@@ -32,7 +32,7 @@ sim_par = {
     'nlorder': 3,
     'delta': 0/180*3.14,
     'zzzz': 10,
-    'xxxx': 5,
+    'xxxx': 15,
     'zzxx': 3
 }
 
