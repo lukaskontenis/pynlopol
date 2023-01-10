@@ -365,6 +365,26 @@ class ClassChi:
         rmat = get_rotation_matrix(omega=omega, psi=psi)
         self._rotate(rmat)
 
+    def print(self):
+        """Print contracted tensor values to console."""
+
+        # Print column labels. The "{:3d}  " format ensures that there are five
+        # symbols in each column label to keep everything centered.
+        for ind in range(len(self.chid[0, :])):
+            print("{:4d}  |".format(ind+1), end='')
+        print('')
+
+        # Print contracted tensor values. Values that are smaller than 0.1 are
+        # omitted entirely for clarity.
+        for ind in range(3):
+            for val in self.chid[ind, :]:
+                if np.abs(val) > 0.01:
+                    print(" {: .1f} |".format(val), end='')
+                else:
+                    print("      |".format(val), end='')
+            print('')
+
+
 # === Helper functions ===
 
 def delta_alpha_2_omega_psi(delta=None, alpha=None):
