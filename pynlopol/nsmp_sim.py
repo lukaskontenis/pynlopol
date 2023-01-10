@@ -170,6 +170,10 @@ def make_pipo_animation_delta(
         sample='zcq', nlorder=2, num_steps=4*18, fps=4*5, pset_name='pipo_100x100', **kwargs):
     """Make PIPO map GIF of a sample by varying delta.
 
+    TODO: it would be good to merge this function with the _ratio variant, but
+    the figure title and file name generation becomes complex for different
+    ratio animation options.
+
     Args:
         sample - Sample name
         pset_name - Polarization set name
@@ -211,7 +215,7 @@ def make_pipo_animation_delta(
             title_str = 'Collagen THG R1={:.2f}, R2={:.2f}'.format(sim_par['zzzz']/sim_par['xxxx'], sim_par['zzxx']/sim_par['xxxx'])
             anim_file_name_suffix = '_thg_r1_{:.2f}_r2_{:.2f}'.format(sim_par['zzzz']/sim_par['xxxx'], sim_par['zzxx']/sim_par['xxxx'])
 
-    anim_file_suffix += '_delta_{:d}'.format(num_steps)
+    anim_file_name_suffix += '_delta_{:d}'.format(num_steps)
 
     print("Making PIPO map animation for " + title_str + " with varying delta")
 
@@ -250,6 +254,105 @@ def make_pipo_animation_delta(
         anim_file_name += sample
 
     anim_file_name += '_pipo_anim' + anim_file_name_suffix + '.gif'
+
+    make_gif(
+        output_name=anim_file_name, file_names=file_names, fps=fps)
+
+    print("Removing frame files...")
+    for file_name in file_names:
+        os.remove(file_name)
+
+    print("All done")
+
+
+def make_pipo_animation_ratio(
+        sample='zcq', nlorder=2, anim_var=None, num_steps=4*18, fps=4*5, pset_name='pipo_100x100', **kwargs):
+    """Make PIPO map GIF of a sample by varying ratio.
+
+    TODO: it would be good to merge this function with the _ratio variant, but
+    the figure title and file name generation becomes complex for different
+    ratio animation options.
+
+    Args:
+        sample - Sample name
+        pset_name - Polarization set name
+        num_steps - Number of delta steps in aniation
+        fps - Display FPS of the GIF
+    """
+    if not fps:
+        fps = num_steps/18*5
+
+    title_str = ''
+    anim_file_name = ''
+
+    if sample == 'zcq':
+        title_str = 'Z-cut quartz'
+        symmetry_str = 'd3'
+        sim_par = {
+            'sample_name': 'd3',
+            'nlorder': nlorder,
+            'delta': 0/180*3.14
+        }
+        title_str = 'Z-cut quartz'
+        anim_file_name = 'zcq_shg'
+
+    elif sample == 'collagen':
+        symmetry_str = 'c6v'
+        delta = kwargs.get('delta', 0)
+        sim_par = {
+            'sample_name': 'c6v',
+            'nlorder': nlorder,
+            'delta': delta/180*3.14
+        }
+
+        if sim_par['nlorder'] == 2:
+            sim_par['zzz'] = 1.5
+            sim_par['zxx'] = 1
+            title_str = 'Collagen SHG delta={:.0f}°'.format(delta)
+            anim_file_name = 'collagen_shg_delta_{:.0f}deg'.format(delta)
+            anim_file_name += '_r_{:d}'.format(num_steps)
+
+        elif sim_par['nlorder'] == 3:
+            sim_par['zzzz'] = 10
+            sim_par['xxxx'] = 15
+            sim_par['zzxx'] = 3
+
+            if anim_var == 'zzzz':
+                title_str = 'Collagen THG R2={:.2f}, delta={:.0f}°'.format(sim_par['zzxx']/sim_par['xxxx'], delta)
+                anim_file_name = 'collagen_thg_r2_{:.2f}_delta_{:.0f}deg'.format(sim_par['zzxx']/sim_par['xxxx'], delta)
+                anim_file_name += '_r1_{:d}'.format(num_steps)
+            elif anim_var == 'zzxx':
+                title_str = 'Collagen THG R1={:.2f}, delta={:.0f}°'.format(sim_par['zzzz']/sim_par['xxxx'], delta)
+                anim_file_name = 'collagen_thg_r1_{:.2f}_delta_{:.0f}deg'.format(sim_par['zzzz']/sim_par['xxxx'], delta)
+                anim_file_name += '_r2_{:d}'.format(num_steps)
+
+    print("Making PIPO map animation for " + title_str + " with varying ratio")
+
+    ratio_arr = np.linspace(0.7, 5, num_steps)
+    ratio_arr = np.concatenate([ratio_arr, np.flip(ratio_arr, 0)[1:-1]])
+
+    file_names = []
+    for ind, ratio in enumerate(ratio_arr):
+        plt.clf()
+
+        sim_par[anim_var] = ratio
+        print("Frame {:d}. {:}={:.2f}".format(ind, anim_var, ratio))
+
+        pipo_data = simulate_pipo(
+            **sim_par, symmetry_str=symmetry_str, pset_name=pset_name)
+
+        plot_pipo(pipo_data, show_fig=False, pset_name=pset_name, **kwargs)
+
+        if not kwargs.get('bare_plot_data'):
+            plt.title(title_str + " PIPO map, {:}={:.2f}".format(
+                anim_var.upper(), ratio))
+
+        file_name = 'frame_{:d}.png'.format(ind)
+        file_names.append(file_name)
+        export_figure(file_name, resize=False)
+
+    print("Exporting GIF...")
+    anim_file_name += '_pipo_anim.gif'
 
     make_gif(
         output_name=anim_file_name, file_names=file_names, fps=fps)
