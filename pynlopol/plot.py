@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
-from lkcom.plot import export_figure
+from lkcom.plot import export_figure, set_ticks_inside, align_outer_tick_labels
 
 from pynlopol.nsmp_common import get_num_states, \
     get_nsmp_state_order
@@ -18,8 +18,8 @@ from pynlopol.nsmp_common import get_num_states, \
 
 def plot_pipo(
         data, title_str=None, round_to_thr=True, thr=1E-3,
-        pset_name='pipo_8x8',
-        export_fig=False, fig_file_name=None, show_fig=True):
+        pset_name='pipo_8x8', bare_plot_data=False,
+        export_fig=False, fig_file_name=None, show_fig=True, **kwargs):
     """Plot a PIPO map.
 
     Args:
@@ -37,6 +37,27 @@ def plot_pipo(
     num_psg_states, num_psa_states = get_num_states(pset_name)
     psg_states, psa_states = get_nsmp_state_order(pset_name)
 
+    # PIPO values at 0 deg and 180 deg are the same and are usually omitted in
+    # the dataset for compactness and especially to avoid suggesting to scan
+    # the same state twice when tyring to conform to the data format. For
+    # display purposes, on the other hand, it is more useful to have duplicate
+    # 0 deg and 180 deg to make the PIPO bubble symmetric. The PIPO dataset is
+    # expanded here for this reason.
+    duplicate_first_state = True
+    if duplicate_first_state:
+        data2 = np.ndarray(np.array(data.shape) + [1, 1])
+        data2.fill(np.nan)
+        data2[:-1, :-1] = data
+        data2[:-1, -1] = data[:, 0]
+        data2[-1, :-1] = data[0, :]
+        data2[-1, -1] = data[0, 0]
+
+        psg_states.append('180')
+        psa_states.append('180')
+
+        num_psg_states += 1
+        num_psa_states += 1
+
     # When adding x and y ticks for a small number of PSG and PSA states, it's
     # best tick each state and center the tick on the pixel. For a large number
     # of states, it's better to place ticks automatically on the angle x and y
@@ -49,7 +70,14 @@ def plot_pipo(
                    psa_states[0], psa_states[-1]]]
 
     # Plot PIPO map
-    plt.imshow(data, origin='lower', cmap='plasma', extent=extent)
+    # TODO: contourf looks nicer, but the imshow method will likely work better
+    # when the number of PIPO states is low
+    plt.contourf(data, origin='lower', cmap='plasma', extent=extent)
+    # plt.imshow(data, origin='lower', cmap='plasma', extent=extent)
+
+    plt.axis('square')
+    plt.xlim([0, 180])
+    plt.ylim([0, 180])
 
     # Add state labels
     plt.gca()
@@ -59,22 +87,29 @@ def plot_pipo(
     if num_psa_states <= 10:
         plt.yticks(range(num_psa_states), psa_states)
     else:
-        # Generate ticks automatically using 60-based 1, 2, 3, 6 step
-        # multiples, e.g.:
+        # Put ticks automatically at 45-deg intervals, e.g. 0, 45, 90, 135
+        plt.gca().xaxis.set_major_locator(MaxNLocator(steps=[4.5]))
+        plt.gca().yaxis.set_major_locator(MaxNLocator(steps=[4.5]))
+
+        # TODO: in some cases ticks are better placed at base-60 intervals:
         #   0, 10,  20,  30
         #   0, 20,  40,  60
         #   0, 30,  60,  90
         #   0, 60, 120, 180
-        # Automatic ticking defaults to a 10-based 1, 2, 4, 5, 10, which does
-        # not work well for angles
-        plt.gca().xaxis.set_major_locator(MaxNLocator(steps=[1, 2, 3, 6]))
-        plt.gca().yaxis.set_major_locator(MaxNLocator(steps=[1, 2, 3, 6]))
+        # plt.gca().xaxis.set_major_locator(MaxNLocator(steps=[1, 2, 3, 6]))
+        # plt.gca().yaxis.set_major_locator(MaxNLocator(steps=[1, 2, 3, 6]))
 
     plt.xlabel('Input, deg')
     plt.ylabel('Output, deg')
 
     if title_str is not None:
         plt.title(title_str)
+
+    set_ticks_inside()
+    align_outer_tick_labels(plt.gca())
+
+    if bare_plot_data:
+        plt.axis('off')
 
     if export_fig:
         print("Exporting figure...")
