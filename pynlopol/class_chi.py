@@ -51,8 +51,6 @@ class ClassChi:
         else:
             self.nlorder = nlorder
 
-        self.rank = 2
-
         if symmetry_str == 'nop':
             # Unity tensor that does nothing
             if self.nlorder == 2:
@@ -280,6 +278,7 @@ class ClassChi:
 
     def _rotate(self, rmat=None):
         """Rotate the tensor using the given rotation matrix."""
+
         mask_small_rmat_values = True
         if mask_small_rmat_values:
             mask = np.abs(rmat) < 1e-16
@@ -287,7 +286,7 @@ class ClassChi:
 
         chi_rot = np.zeros_like(self.chi)
 
-        if self.rank == 2:
+        if self.nlorder == 2:
             for I in range(3):
                 for J in range(3):
                     for K in range(3):
@@ -299,7 +298,7 @@ class ClassChi:
                                         rmat[K, k] * \
                                         self.chi[i, j, k]
 
-        elif self.rank == 3:
+        elif self.nlorder == 3:
             for I in range(3):
                 for J in range(3):
                     for K in range(3):
@@ -338,7 +337,7 @@ class ClassChi:
 
                             chi_rot[I, J, K, L] = val
         else:
-            raise(Exception("Unsupported tensor rank {:d}".format(self.rank)))
+            raise RuntimeError("Unsupported tensor order {:d}".format(self.nlorder))
 
         self.chi = chi_rot
         self.contract()
