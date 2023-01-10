@@ -167,7 +167,7 @@ def simulate_pipo(output_type='1point', **kwargs):
 
 
 def make_pipo_animation_delta(
-        sample='zcq', num_steps=9, fps=3, pset_name='pipo_100x100'):
+        sample='zcq', nlorder=2, num_steps=4*18, fps=4*5, pset_name='pipo_100x100', **kwargs):
     """Make PIPO map GIF of a sample by varying delta.
 
     Args:
@@ -176,14 +176,42 @@ def make_pipo_animation_delta(
         num_steps - Number of delta steps in aniation
         fps - Display FPS of the GIF
     """
-    zzz = None
+    title_str = ''
+    anim_file_name_suffix = ''
+
     if sample == 'zcq':
         title_str = 'Z-cut quartz'
         symmetry_str = 'd3'
+        sim_par = {
+            'sample_name': 'd3',
+            'nlorder': nlorder,
+            'delta': 0/180*3.14
+        }
+        title_str = 'Collagen SHG R={:.2f}'.format(sim_par['zzz'])
+        anim_file_name_suffix = '_shg_r_{:.2f}'.format(sim_par['zzz']/sim_par['zxx'])
+
     elif sample == 'collagen':
-        zzz = 1.5
-        title_str = 'Collagen R={:.2f}'.format(zzz)
         symmetry_str = 'c6v'
+        sim_par = {
+            'sample_name': 'c6v',
+            'nlorder': nlorder,
+            'delta': 0/180*3.14
+        }
+
+        if sim_par['nlorder'] == 2:
+            sim_par['zzz'] = 1.5
+            sim_par['zxx'] = 1
+            title_str = 'Collagen SHG R={:.2f}'.format(sim_par['zzz'])
+            anim_file_name_suffix = '_shg_r_{:.2f}'.format(sim_par['zzz']/sim_par['zxx'])
+
+        elif sim_par['nlorder'] == 3:
+            sim_par['zzzz'] = 10
+            sim_par['xxxx'] = 15
+            sim_par['zzxx'] = 3
+            title_str = 'Collagen THG R1={:.2f}, R2={:.2f}'.format(sim_par['zzzz']/sim_par['xxxx'], sim_par['zzxx']/sim_par['xxxx'])
+            anim_file_name_suffix = '_thg_r1_{:.2f}_r2_{:.2f}'.format(sim_par['zzzz']/sim_par['xxxx'], sim_par['zzxx']/sim_par['xxxx'])
+
+    anim_file_suffix += '_delta_{:d}'.format(num_steps)
 
     print("Making PIPO map animation for " + title_str + " with varying delta")
 
@@ -196,23 +224,35 @@ def make_pipo_animation_delta(
     for ind, delta in enumerate(delta_arr):
         plt.clf()
 
+        sim_par['delta'] = delta
+        print("Frame {:d}. delta={:.1f} deg".format(ind, delta*180/np.pi))
+
         pipo_data = simulate_pipo(
-            symmetry_str=symmetry_str, zzz=zzz, delta=delta,
-            pset_name=pset_name)
+            **sim_par, symmetry_str=symmetry_str, pset_name=pset_name)
 
-        plot_pipo(pipo_data, show_fig=False, pset_name=pset_name)
+        # pipo_data = simulate_pipo(
+        #     symmetry_str=symmetry_str, zzz=zzz, delta=delta,
+        #     pset_name=pset_name)
 
-        plt.title(
-            title_str + " PIPO map, delta={:.1f} deg".format(delta*180/np.pi))
+        plot_pipo(pipo_data, show_fig=False, pset_name=pset_name, **kwargs)
 
-        print("Exporting frame {:d}".format(ind))
+        if not kwargs.get('bare_plot_data'):
+            plt.title(
+                title_str + " PIPO map, delta={:.1f} deg".format(delta*180/np.pi))
+
         file_name = 'frame_{:d}.png'.format(ind)
         file_names.append(file_name)
         export_figure(file_name, resize=False)
 
     print("Exporting GIF...")
+    anim_file_name = ''
+    if sample:
+        anim_file_name += sample
+
+    anim_file_name += '_pipo_anim' + anim_file_name_suffix + '.gif'
+
     make_gif(
-        output_name=sample + '_delta_pipo.gif', file_names=file_names, fps=fps)
+        output_name=anim_file_name, file_names=file_names, fps=fps)
 
     print("Removing frame files...")
     for file_name in file_names:
