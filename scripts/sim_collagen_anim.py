@@ -14,7 +14,7 @@ print("=== pynlopol ===")
 print("Generating PIPO map GIFs...")
 
 from lkcom.util import handle_general_exception
-from pynlopol import make_pipo_animation_delta, \
+from pynlopol.nsmp_sim import make_pipo_animation_delta, \
     make_pipo_animation_zzz
 
 try:
