@@ -46,7 +46,7 @@ def gen_pol_state_sequence(
         print("Output state: {:s}".format(output_state))
         print("Reference states: {:b}".format(with_ref_states))
 
-    validate_pset_name(pset_name)
+        validate_pset_name(pset_name)
     valid_scan_oders = {'psa_first', 'psg_first'}
 
     if scan_order not in valid_scan_oders:

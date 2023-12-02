@@ -371,7 +371,8 @@ def get_nsmp_state_order(pset_name, duplicate_pipo_states=False, **kwargs):
         duplicate_pipo_states - Dupliate the initial and final states in a PIPO
             set, i.e. the PSG and PSA angles start and stop at the same value.
     """
-    validate_pset_name(pset_name)
+    if kwargs.get('vlvl', 1) > 2:
+        validate_pset_name(pset_name)
 
     if is_pset_pipo(pset_name):
         num_psg_states, num_psa_states = get_num_states(pset_name)
