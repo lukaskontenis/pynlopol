@@ -19,7 +19,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'numpy>=1.19.5', 'matplotlib>=3.3.3', 'scipy>=1.5.4', 'imageio>=2.9.0', 'pynlomic>=1.0.1', 'lkcom>=0.3.0',
+        'numpy>=1.19.5', 'matplotlib>=3.3.3', 'scipy>=1.5.4', 'imageio>=2.9.0', 'pynlomic>=1.1.0', 'lkcom>=0.4.0',
     ],
     python_requires='>=3.6',
     data_files=[
@@ -31,6 +31,7 @@ setuptools.setup(
         'scripts/make_nsmp_tiff.py',
         'scripts/pipo_check_c6v.py',
         'scripts/plot_pipo_fit.py',
+        'scripts/plot_pipo_fit_map.py',
         'scripts/plot_piponator_fit.py',
         'scripts/show_pipo.py',
         'scripts/sim_collagen_anim.py',
@@ -44,6 +45,7 @@ setuptools.setup(
         'scripts/sim_zcq_pipo_anim.py',
         'scripts/verify_pol_state_sequence.py']),
         ('tests', [
+        'tests/run_thg_c6v_pipo_fit_test.py',
         'tests/pipo_8x8_pol_states.dat',
         'tests/test_polarimetry_fit.py',
         'tests/test_polarimetry_lin.py',

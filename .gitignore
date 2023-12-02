@@ -4,6 +4,7 @@ pynlopol.egg-info/
 dist/
 docs/
 examples/
+*.pyc
 *.png
 *.gif
 todo.txt
