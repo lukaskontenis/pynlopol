@@ -6,6 +6,8 @@ pynlopol is a Python library for nonlinear microscopy and polarimetry.
 
 ## Quick start
 
+https://github.com/lukaskontenis/pynlopol/assets/3004611/1e09f3dd-66de-4fac-b040-85d6ce02e57c
+
 pynlopol requires Python v3.6 or later. To run the scripts from the command
 line, Python has to be included in the system path.
 
