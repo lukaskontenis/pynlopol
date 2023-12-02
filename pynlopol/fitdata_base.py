@@ -72,7 +72,7 @@ class _FitData_Base:
         fit_model = self.get_fit_model()
         if fit_model == 'zcq':
             return ['ampl', 'delta']
-        if fit_model == 'c6v':
+        if fit_model == 'shg_c6v':
             return ['ampl', 'zzz', 'delta']
 
     def get_par_human_val_str(self, par_name, par_val):
@@ -92,6 +92,8 @@ class _FitData_Base:
         """
         par_fmt = {'ampl': {'suppress_suffix': 'm'},
                    'zzz': {'num_decimal_places': 3, 'suppress_suffix': 'm'},
+                   'zzzz': {'num_decimal_places': 3, 'suppress_suffix': 'm'},
+                   'xxxx': {'num_decimal_places': 3, 'suppress_suffix': 'm'},
                    'delta': {'num_decimal_places': 2, 'suppress_suffix': 'm'}}
         return par_fmt.get(par_name)
 
@@ -103,6 +105,8 @@ class _FitData_Base:
         """
         par_type = {'ampl': 'gen',
                     'zzz': 'ratio',
+                    'zzzz': 'ratio',
+                    'xxxx': 'ratio',
                     'delta': 'angle'}
         return par_type.get(par_name)
 
@@ -113,6 +117,8 @@ class _FitData_Base:
         """
         par_varstr = {'ampl': 'A',
                       'zzz': 'R',
+                      'zzzz': 'zzzz',
+                      'xxxx': 'xxxx',
                       'delta': 'δ'}
         return par_varstr.get(par_name, par_name)
 
@@ -122,6 +128,8 @@ class _FitData_Base:
         Errors are indexed by canonical parameter names.
         """
         typical_err = {'zzz': 0.01,
+                       'zzzz': 0.01,
+                       'xxxx': 0.01,
                        'delta': 0.1/180*np.pi}
         return typical_err.get(par_name)
 

@@ -3,7 +3,7 @@
 
 This file contains polarimetry fitting tests.
 
-Copyright 2015-2021 Lukas Kontenis
+Copyright 2015-2023 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
 import unittest
@@ -97,6 +97,45 @@ class TestPolarimetryFit(unittest.TestCase):
         else:
             print(fit_model + ' fitting FAILED')
             self.assertTrue(False)
+
+    def test_thg_c6v_pipo_fit(self):
+        """Test single-point THG C6v PIPO fitting."""
+        print("Testing THG C6v single-point PIPO fitting...")
+
+        # THG C6v
+        sim_par = {
+            'sample_name': 'c6v',
+            'symmetry_str': 'c6v',
+            'nlorder': 3,
+            'delta': 10/180*3.14,
+            'zzzz': 10,
+            'xxxx': 13,
+            'zzxx': 2.5,
+            'pset_name': 'pipo_8x8',
+            'output_type': '1point'
+        }
+
+        pipo_data = simulate_pipo(**sim_par)
+
+        fit_model = 'c6v'
+        fitfun_names = ['c6v_ag', 'nsmpsim']
+
+        for fitfun_name in fitfun_names:
+            fit_result = fit_pipo(ask_before_overwrite=False,
+                pipo_arr=pipo_arr, fit_model=fit_model, fitfun_name=fitfun_name,
+                print_results=False, plot_progress=False, show_fig=False)
+
+            fit_result.set_ref_par({'zzz': zzz, 'delta': delta})
+            fit_result.print()
+            if fit_result.test_against_ref():
+                print(fit_model + ' fitting using ' + fitfun_name +
+                      ' fit function verified')
+            else:
+                print(fit_model + ' fitting using ' + fitfun_name +
+                      ' fit function FAILED')
+                self.assertTrue(False)
+
+    
 
 if __name__ == '__main__':
     unittest.main(exit=False)

@@ -20,7 +20,7 @@ from pynlopol.nsmp_fit import fit_pipo
 
 # Image area to crop before fitting:
 #   [from_row, to_row, from_col, to_col], in pixels
-cropsz = [46, 87, 135, 152]
+# cropsz = [46, 87, 135, 152]
 
 print("=== PIPO fitter ===")
 

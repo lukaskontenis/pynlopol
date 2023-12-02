@@ -16,7 +16,7 @@ from lkcom.plot import export_figure, imshow_ex
 from lkcom.string import get_human_val_str
 from lkcom.dataio import list_files_by_pattern, check_file_exists
 
-from pynlomic.proc import load_pipo
+from pynlomic.proc import load_pipo, bin_arr
 from pynlopol.nsmp_common import get_num_states, get_nsmp_state_order
 from pynlopol.nsmp_sim import simulate_pipo
 from pynlopol.imgfitdata import ImgFitData
@@ -113,42 +113,53 @@ def plot_pipo_fit_1point(
         show_fig=False, new_fig=True,
         export_fig=False, fig_file_name=None, **kwargs):
     """Plot PIPO fit result for a single point."""
-    if fit_data is None and fit_model not in ['zcq', 'c6v']:
+    if fit_data is None and fit_model not in ['zcq', 'shg_c6v', 'thg_c6v']:
         raise Exception("Unsupported fitting model")
 
     if fit_data is None and fit_par is None:
         raise Exception("No fit parameters given")
 
     if fit_model and (fit_model == 'zcq' and len(fit_par) != 2) or \
-            (fit_model == 'c6v' and len(fit_par) != 3):
+            (fit_model == 'shg_c6v' and len(fit_par) != 3) or \
+            (fit_model == 'thg_c6v' and len(fit_par) != 4):
         raise Exception("Incorrect number of fit parameters")
 
-    zzz = None
+    sim_par = {
+        'symmetry_str': fit_model.split('_')[-1],
+        'nlorder': {'shg': 2, 'thg': 3}.get(fit_model.split('_')[0], 2),
+        'ampl': fit_par[0],
+        'delta': fit_par[1],
+    }
+    # 'pset_name': 'pipo_8x8',
+    #    'output_type': '1point'
+
     if fit_model == 'zcq':
-        ampl = fit_par[0]
-        delta = fit_par[1]
         delta_period = 60/180*np.pi
-        symmetry_str = 'd3'
-    elif fit_model == 'c6v':
-        ampl = fit_par[0]
-        delta = fit_par[1]
-        zzz = fit_par[2]
+        sim_par['symmetry_str'] = 'd3'
+    elif fit_model == 'shg_c6v':
+        sim_par['zzz'] = fit_par[2]
         delta_period = 180/180*np.pi
-        symmetry_str = 'c6v'
+    elif fit_model == 'thg_c6v':
+        sim_par['zzzz'] = fit_par[2]
+        sim_par['xxxx'] = fit_par[3]
+        delta_period = 180/180*np.pi
 
     if fit_data is None:
-        fit_data = ampl*simulate_pipo(
-            symmetry_str=symmetry_str, delta=delta, zzz=zzz)
+        fit_data = sim_par['ampl']*simulate_pipo(**sim_par)
 
     res = data - fit_data
     err = np.sqrt(np.mean(res**2))
     err_str = get_human_val_str(err)
 
     if fit_par is not None:
-        ampl_str = get_human_val_str(ampl, suppress_suffix='m')
-        zzz_str = get_human_val_str(zzz, num_sig_fig=3, suppress_suffix='m')
+        ampl_str = get_human_val_str(sim_par['ampl'], suppress_suffix='m')
+        if fit_model == 'shg_c6v':
+            zzz_str = get_human_val_str(sim_par['zzz'], num_sig_fig=3, suppress_suffix='m')
+        elif fit_model == 'thg_c6v':
+            zzzz_str = get_human_val_str(sim_par['zzzz'], num_sig_fig=3, suppress_suffix='m')
+            xxxx_str = get_human_val_str(sim_par['xxxx'], num_sig_fig=3, suppress_suffix='m')
         delta_str = get_human_val_str(
-            unwrap_angle(delta, period=delta_period)/np.pi*180,
+            unwrap_angle(sim_par['delta'], period=delta_period)/np.pi*180,
             num_sig_fig=3, suppress_suffix='m')
 
     if new_fig:
@@ -166,9 +177,12 @@ def plot_pipo_fit_1point(
     if fit_model == 'zcq':
         plt.title('Fit model ''{:s}''\nA = {:s}, δ = {:s}°'.format(
             fit_model, ampl_str, delta_str))
-    elif fit_model == 'c6v':
+    elif fit_model == 'shg_c6v':
         plt.title('Fit model ''{:s}''\nA = {:s}, R = {:s}, δ = {:s}°'.format(
             fit_model, ampl_str, zzz_str, delta_str))
+    elif fit_model == 'thg_c6v':
+        plt.title('Fit model ''{:s}''\nA = {:s}, zzzz = {:s}, xxxx = {:s}, δ = {:s}°'.format(
+            fit_model, ampl_str, zzzz_str, xxxx_str, delta_str))
     plt.subplot(1, 3, 3)
     plot_pipo(res, cmap='coolwarm', round_to_thr=False, tick_step=2, show_y_label=False)
 
@@ -189,7 +203,7 @@ def plot_pipo_fit_1point(
 
 def plot_pipo_fit_img(
         fitdata, pipo_arr=None,
-        show_fig=True, new_fig=True,
+        show_fig=True, new_fig=True, fig_title=None,
         export_fig=False, fig_file_name=None, **kwargs):
     """Make a PIPO fit result figure for an image."""
     plt.figure(figsize=[10, 10])
@@ -200,42 +214,64 @@ def plot_pipo_fit_img(
         total_cnt_img[0, 0] = 0
         imshow_ex(
             total_cnt_img, bad_color='black', ax=ax, logscale=True, cmap='viridis',
-            title_str='SHG intensity', with_hist=True)
+            title_str='SHG intensity {:d}x{:d}'.format(*total_cnt_img.shape), with_hist=True)
     else:
         print("PIPO array not available, total count image will not be shown")
 
     fit_model = fitdata.get_fit_model()
     zzz = None
-    if fit_model in ['zcq', 'c6v', 'c6']:
+
+    if fit_model in ['zcq', 'shg_c6v', 'shg_c6']:
         ampl = fitdata.get_par()['ampl']
         delta = unwrap_angle(fitdata.get_par()['delta'])
 
-    if fit_model in ['c6v', 'c6']:
+    if fit_model in ['shg_c6v', 'shg_c6']:
         zzz = fitdata.get_par()['zzz']
 
     ax = plt.subplot(2, 2, 2)
+    from matplotlib.cm import viridis, plasma
+    cmap = viridis
+    cmap.set_bad('white', 1.)
+    ampl[fitdata.get_mask()] = np.nan
     imshow_ex(
-        ampl, ax=ax, logscale=False, cmap='viridis',
-        title_str='Amplitude (counts)', with_hist=True)
+        ampl, ax=ax, logscale=False, cmap=cmap,
+        title_str='Amplitude (counts) {:d}x{:d}'.format(*ampl.shape), with_hist=True, bad_color=[1, 1, 1])
 
     ax = plt.subplot(2, 2, 3)
+
+    # TODO: likely need to downsample the delta map for meaningful fisplay
+    delta = delta + np.pi/2
+    delta = bin_arr(delta, (32, 32), mode='mean')
     ones_arr = np.ones(np.shape(delta))
     ones_arr[np.flipud(np.isnan(delta))] = np.nan
+    # plt.quiver(
+    #     ones_arr, ones_arr, angles=-np.flipud(delta)/np.pi*180, headaxislength=0,
+    #     headlength=0)
+
+    # block_map(int_img=total_cnt_img, map_img=zzz, int_rng=None, map_rng=[0.1, 2.5],
+    #       log10int=True, map_type='interp', cmap='Wistia')
+
+    # TODO: need a better quiver function
     plt.quiver(
         ones_arr, ones_arr, angles=-np.flipud(delta)/np.pi*180, headaxislength=0,
-        headlength=0)
+        headlength=0, pivot='mid', width=0.005, scale_units='width', scale=80); plt.axis('equal')
     plt.axis('equal')
     plt.axis('off')
-    plt.title('Orientation map')
+    plt.title('ẟ')
     # imshow_ex(
     #     delta, vmin=-90, vmax=90, ax=ax, logscale=False, cmap='hsv', title_str='delta (deg)',
     #     with_hist=True, is_angle=True)
 
     ax = plt.subplot(2, 2, 4)
+    cmap = plasma
+    cmap.set_bad('white', 1.)
     imshow_ex(
-        zzz, ax=ax, logscale=False, cmap='plasma', title_str='zzz',
-        vmin=0.5, vmax=3, min_vspan=0.2,
-        with_hist=True)
+        zzz, ax=ax, logscale=False, cmap=cmap, title_str='zzz/zxx',
+        vmin=0.1, vmax=2.5, min_vspan=0.2,
+        with_hist=True, bad_color=[1, 1, 1])
+
+    if fig_title:
+        plt.suptitle(fig_title)
 
     if export_fig:
         print("Exporting figure...")
@@ -283,7 +319,7 @@ def plot_piponator_fit(**kwargs):
     fitdata = ImgFitData()
     fitdata.set_par({'ampl': ampl, 'backg': backg, 'delta': delta, 'zzz': zzz, 'xyz': xyz})
     fitdata.set_fit_err(rsqad, type='rsqad')
-    fitdata.cfg.fit_model = 'c6'
+    fitdata.cfg.set_fit_model('shg_c6')
     fitdata.set_mask(rsqad == 0)
 
     plot_pipo_fit_img(fitdata, **kwargs)

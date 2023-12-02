@@ -6,7 +6,7 @@ This script is part of pynlopol, a Python library for nonlinear polarimetry.
 Copyright 2015-2022 Lukas Kontenis
 Contact: dse.ssd@gmail.com
 """
-import time
+from time import time
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import least_squares
@@ -37,7 +37,7 @@ def get_default_fitaccel_filename():
 
 def get_default_fitfun_name(fit_model):
     """Get the default fit function name."""
-    if fit_model == 'c6v':
+    if fit_model == 'shg_c6v':
         return 'c6v_ag'
     elif fit_model == 'zcq':
         return 'nsmpsim'
@@ -50,31 +50,40 @@ def pipo_fitfun(
         fit_accel=None,
         print_progress=False, plot_progress=False, vlvl=1):
     """Fit optimization function for PIPO."""
-    symmetry_str = fit_model
+    sim_par = {
+        'symmetry_str': fit_model.split('_')[-1],
+        'nlorder': {'shg': 2, 'thg': 3}[fit_model.split('_')[0]],
+        'ampl': par[0],
+        'delta': par[1],
+    }
+
+    # 'pset_name': 'pipo_8x8',
+    # 'output_type': '1point'
 
     zzz = None
-    if fit_model in ['zcq', 'c6v']:
-        ampl = par[0]
-        delta = par[1]
+    if fit_model == 'zcq':
         delta_period = 60/180*np.pi
-
-    if fit_model == 'c6v':
-        zzz = par[2]
+    elif fit_model == 'shg_c6v':
+        sim_par['zzz'] = par[2]
+        delta_period = 180/180*np.pi
+    elif fit_model == 'thg_c6v':
+        sim_par['zzzz'] = par[2]
+        sim_par['xxxx'] = par[3]
         delta_period = 180/180*np.pi
 
-    delta = unwrap_angle(delta, delta_period, plus_minus_range=False)
+    sim_par['delta'] = unwrap_angle(sim_par['delta'], delta_period, plus_minus_range=False)
 
     if fit_accel is not None:
         try:
-            mapind = int(interpn(
-                fit_accel['pargrid'], fit_accel['mapinds'], [delta, zzz],
-                method='nearest', bounds_error=True))
+            if fit_model == 'shg_c6v':
+                mapind = int(interpn(
+                    fit_accel['pargrid'], fit_accel['mapinds'], [sim_par['delta'], sim_par['zzz']],
+                    method='nearest', bounds_error=True))
         except ValueError:
             print('val error')
-        fit_data = ampl*fit_accel['maps'][mapind]
+        fit_data = sim_par['ampl']*fit_accel['maps'][mapind]
     else:
-        fit_data = ampl*simulate_pipo(
-            symmetry_str=symmetry_str, delta=delta, zzz=zzz)
+        fit_data = sim_par['ampl']*simulate_pipo(**sim_par)
 
     if np.any(np.isnan(fit_data)):
         print("NaN in fit model")
@@ -83,10 +92,14 @@ def pipo_fitfun(
     err = np.mean(np.sqrt(res**2))
 
     if plot_progress or print_progress or vlvl >= 2:
-        ampl_str = get_human_val_str(ampl, suppress_suffix='m')
-        zzz_str = get_human_val_str(zzz, num_sig_fig=3, suppress_suffix='m')
+        ampl_str = get_human_val_str(sim_par['ampl'], suppress_suffix='m')
+        if fit_model == 'shg_c6v':
+            zzz_str = get_human_val_str(sim_par['zzz'], num_sig_fig=3, suppress_suffix='m')
+        elif fit_model == 'thg_c6v':
+            zzzz_str = get_human_val_str(sim_par['zzzz'], num_sig_fig=3, suppress_suffix='m')
+            xxxx_str = get_human_val_str(sim_par['xxxx'], num_sig_fig=3, suppress_suffix='m')
         delta_str = get_human_val_str(
-            unwrap_angle(delta)/np.pi*180, num_sig_fig=3)
+            unwrap_angle(sim_par['delta'])/np.pi*180, num_sig_fig=3)
         err_str = get_human_val_str(err)
 
     if plot_progress:
@@ -97,8 +110,10 @@ def pipo_fitfun(
 
     if vlvl >= 2:
         msg = "A = {:s}, δ = {:s}°".format(ampl_str, delta_str)
-        if fit_model == 'c6v':
+        if fit_model == 'shg_c6v':
             msg += ", R = {:s}".format(zzz_str)
+        elif fit_model == 'thg_c6v':
+            msg += ", zzzz = {:s}, xxxx = {:s}".format(zzzz_str, xxxx_str)
         msg += ", err = {:s}".format(err_str)
         if fit_accel is not None:
             msg += ", mapind = {:d}".format(mapind)
@@ -172,8 +187,12 @@ def pipo_c6_fun(par):
 
 def pipo_c6v_fitfun(
         par, xdata, data, fit_model='c6v', fitfun_name='c6_ag', fit_accel=None,
-        plot_progress=False, vlvl=1):
-    """Fit optimization function for C6 PIPO."""
+        print_progress=False, plot_progress=False, vlvl=1):
+    """Fit optimization function for C6 PIPO.
+
+    TODO: prin_progress does nothing, should merge functionality pipo_fitfun
+    for this.
+    """
     ampl = par[0]
     delta = par[1]
     zzz = par[2]
@@ -222,6 +241,8 @@ def get_fit_accel(fit_model='c6v'):
     num_delta = 50
     delta_step = (delta_max - delta_min)/num_delta
     delta_arr = np.linspace(delta_min, delta_max, num_delta)
+    fit_accel = None
+    diff_step = None
 
     if fit_model == 'zcq':
         mapinds = np.reshape(np.arange(0, num_delta), [num_delta])
@@ -249,7 +270,7 @@ def get_fit_accel(fit_model='c6v'):
 
         diff_step = [0.1, 2*delta_step]
 
-    elif fit_model == 'c6v':
+    elif fit_model == 'shg_c6v':
         zzz_min = 1
         zzz_max = 2
         num_zzz = 20
@@ -257,7 +278,7 @@ def get_fit_accel(fit_model='c6v'):
         zzz_arr = np.linspace(zzz_min, zzz_max, num_zzz)
 
         mapinds = np.reshape(np.arange(0, num_delta*num_zzz), [num_delta, num_zzz])
-        accel_file_name = 'fit_accel_c6v.npy'
+        accel_file_name = 'fit_accel_shg_c6v.npy'
         try:
             maps = np.load(accel_file_name)
             print("Loaded fit accel data from '{:s}'".format(accel_file_name))
@@ -281,6 +302,8 @@ def get_fit_accel(fit_model='c6v'):
         fit_accel['maps'] = maps
 
         diff_step = [0.1, 2*delta_step, 2*zzz_step]
+    else:
+        print("Fit acceleration for model '{:}' not available".format(fit_model))
 
     return fit_accel, diff_step
 
@@ -299,62 +322,85 @@ def verify_fit_accel(fit_accel=None):
     plt.imshow(err)
     plt.show()
 
+def fit_pipo_1point(guess_strategy='map', fit_algorithm='scipy_least_quares', **kwargs):
+    """Guess initial values and fit single-point PIPO data.
 
-def fit_pipo_1point(
-        pipo_arr=None, file_name=None, fit_model='zcq', fitfun_name=None,
-        map_guess=True, use_fit_accel=False, fit_accel=None, diff_step=None,
-        plot_progress=False, print_results=True, plot_fig=True,
-        true_par=None, vlvl=1,
-        **kwargs):
-    """Fit PIPO using single-point data."""
-    t_start = time.time()
+    Some models and data need multiple guesses to not get stuck in a local
+    mininum. This function starts with multiple guess fits with lower fitting
+    accuracy and then selects the best one for the final fit.
+
+    """
+    pipo_arr = kwargs.get('pipo_arr')
 
     if pipo_arr is None:
-        pipo_arr = load_pipo(file_name, binsz=None)
+        raise Exception("PIPO data not provided")
 
-    if fit_model not in ['zcq', 'c6v']:
-        raise Exception("Unsupported fittig model")
+    if fit_algorithm == 'scipy_minimize':
+        from scipy.optimize import minimize, least_squares
+        t_start = time()
 
-    if use_fit_accel and fit_model != 'c6v':
-        raise Exception("Fit acceleration only supported for c6v")
+        def err_func(par_arr):
+            return np.sum(np.abs((pipo_arr - par_arr[0]*simulate_pipo(symmetry_str='c6v', nlorder=3, pset_name='pipo_8x8', delta=par_arr[1], zzzz=par_arr[2], xxxx=par_arr[3])).flatten()))
+
+        t_start = time()
+        fit_result = minimize(err_func, [np.max(pipo_arr), 0, 3, 3])
+        # fit_result = minimize(err_func, [3.125E4, -2.45E-2, 3.08, 4.08])
+
+        # fit_result = least_squares(err_func, [np.max(pipo_arr), 0, 3, 3])
+
+        fit_duration = time() - t_start
+        # print(fit_duration)
+        # print(fit_result.x)
+        fitdata = FitData(fit_result)
+        fitdata.set_fit_model(kwargs.get('fit_model'))
+        fitdata.set_fitfun_name(fit_algorithm)
+        fitdata.set_fit_duration(fit_duration)
+
+        return fitdata
+
+    use_fit_accel = kwargs.get('use_fit_accel')
+    fit_accel = kwargs.get('fit_accel')
+    if guess_strategy == 'map':
+        if use_fit_accel:
+            if fit_accel is None:
+                fit_accel, diff_step = get_fit_accel(fit_model)
+
+            # test_fit_accel = False
+            # if test_fit_accel:
+            #     verify_fit_accel(fit_accel)
+        else:
+            print("Can't use map guessing without a fit accelerator")
+            guess_strategy = 'multistart'
 
     max_ampl = np.max(pipo_arr)
+    fit_model = kwargs.get('fit_model')
     if fit_model == 'zcq':
         guess_par = [max_ampl, 0]
         bounds = [
             [0,             -np.pi],
             [max_ampl*1.5,  np.pi]]
-    elif fit_model == 'c6v':
+    elif fit_model == 'shg_c6v':
+        #            A         δ  zzz
         guess_par = [max_ampl, 0, 1]
         bounds = [
             [0,             0,      0.1],
             [max_ampl*100,  np.pi,  10]]
+    elif fit_model == 'thg_c6v':
+        #            A         δ  zzzz  XXXX
+        guess_par = kwargs.get('guess_par', [max_ampl, 0, 10,    5])
+        bounds = [
+            [0,             0,      0.1,    0.1],
+            [max_ampl*100,  np.pi,  100,    100]]
+    else:
+        raise ValueError("Fit model '{:}' unsupported".format(fit_model))
 
-    if plot_progress:
-        plt.figure(figsize=[12, 5])
-
-    if map_guess or use_fit_accel:
-        if fit_accel is None:
-            fit_accel, diff_step = get_fit_accel(fit_model)
-
-        test_fit_accel = False
-        if test_fit_accel:
-            verify_fit_accel(fit_accel)
-
-    fit_cfg = {
-        'fit_model': fit_model,
-        'plot_progress': plot_progress,
-        'print_progress': False,
-        'fit_accel': fit_accel,
-        'vlvl': vlvl
-    }
-
+    vlvl = kwargs.get('vlvl', 0)
     if vlvl >= 1:
         print("Determining guess values...")
 
-    # Use a sparse map covering all expected parameter ranges to find a good
-    # guess value
-    if map_guess:
+    if guess_strategy == 'map':
+        # Use a sparse map covering all expected parameter ranges to find a good
+        # guess value
         accel_maps = fit_accel['maps']
         num_maps = accel_maps.shape[0]
         err = np.ndarray([num_maps])
@@ -382,7 +428,7 @@ def fit_pipo_1point(
                 print("Guess values: A={:.1f}M, δ={:.1f}°".format(
                     guess_par[0]*1E-6, guess_par[1]/np.pi*180))
 
-        elif fit_model == 'c6v':
+        elif fit_model == 'shg_c6v':
             guess_inds = np.unravel_index(
                 np.argmin(err), [len(pargrid[0]), len(pargrid[1])])
             guess_par = [max_ampl,
@@ -396,6 +442,7 @@ def fit_pipo_1point(
                 print("Guess values: A={:.1f}M, zzz={:.2f}, δ={:.1f}°".format(
                     guess_par[0]*1E-6, guess_par[1], guess_par[2]/np.pi*180))
 
+        true_par = kwargs.get('true_par')
         if vlvl >= 2 and true_par is not None:
             for ind, guess_par1 in enumerate(guess_par):
                 if ind == 0:
@@ -405,11 +452,66 @@ def fit_pipo_1point(
                 if find_closest(pargrid[ind-1], true_par[ind]) != guess_inds[ind-1]:
                     print("Parameter map guess could have been better")
 
-        fit_cfg = {
-            'fit_model': fit_model,
-            'plot_progress': plot_progress,
-            'vlvl': vlvl
-        }
+        return _fit_pipo_1point(guess_par=guess_par, bounds=bounds, **kwargs)
+
+    elif guess_strategy == 'multistart':
+        if fit_model != 'thg_c6v':
+            raise RuntimeError("Multistart guess strategy only avaialbe for the THG C6v model")
+
+        guess_set = []
+        for delta in np.array([0, 60, 120])/180*np.pi:
+            guess_set.append(np.array([max_ampl, delta, 3, 3]))
+
+        kwargs['print_results'] = False
+        kwargs['plot_fig'] = False
+        kwargs['xtol'] = 0.1
+        kwargs['vlvl'] = 0
+        kwargs['bounds'] = np.array(bounds)
+        guess_fit_data_arr = []
+        for guess_ind, guess_par in enumerate(guess_set):
+            print("Guess ind {:d} of {:d}".format(guess_ind+1, len(guess_set)))
+            try:
+                guess_fit_data_arr.append(_fit_pipo_1point(guess_par=guess_par, **kwargs))
+            except Exception as excpt:
+                print(excpt)
+
+        opt_guess_ind = np.argmin([guess_fit_data.get_fit_err() for guess_fit_data in guess_fit_data_arr])
+        opt_guess_par = guess_set[opt_guess_ind]
+        kwargs['xtol'] = None
+        kwargs['vlvl'] = 1
+        kwargs['ftol'] = None
+        return _fit_pipo_1point(guess_par=opt_guess_par, **kwargs)
+
+
+def _fit_pipo_1point(
+        pipo_arr=None, file_name=None, fit_model='zcq', fitfun_name=None,
+        guess_par=None, true_par=None, bounds=None, xtol=0.0001,
+        use_fit_accel=False, fit_accel=None, diff_step=None,
+        plot_progress=False, print_results=True, plot_fig=True,
+        vlvl=1,
+        **kwargs):
+    """Fit PIPO using single-point data."""
+    t_start = time()
+
+    if pipo_arr is None:
+        pipo_arr = load_pipo(file_name, binsz=None)
+
+    if fit_model not in ['zcq', 'shg_c6v', 'thg_c6v']:
+        raise Exception("Unsupported fittig model")
+
+    if use_fit_accel and fit_model != 'shg_c6v':
+        raise Exception("Fit acceleration only supported for shg_c6v")
+
+    if plot_progress:
+        plt.figure(figsize=[12, 5])
+
+    fit_cfg = {
+        'fit_model': fit_model,
+        'plot_progress': plot_progress,
+        'print_progress': False,
+        'fit_accel': fit_accel,
+        'vlvl': vlvl
+    }
 
     if vlvl >= 1:
         print("Fitting data", end='')
@@ -448,16 +550,16 @@ def fit_pipo_1point(
         if vlvl >= 1:
             print("Guess beyond lower bound, setting to upper band")
 
-        guess_par[guess_par_bound_check_hi] = bounds[1][guess_par_bound_check_hi]
+        guess_par[guess_par_bound_check_hi] = np.array(bounds[1])[guess_par_bound_check_hi]
 
     if plot_progress:
         print("\nGuess parameters: ", guess_par)
 
     fit_result = least_squares(
         fitfun, guess_par, args=(0, pipo_arr), diff_step=diff_step,
-        bounds=bounds, xtol=0.0001, kwargs=fit_cfg)
+        bounds=bounds, xtol=xtol, kwargs=fit_cfg)
 
-    fit_duration = time.time() - t_start
+    fit_duration = time() - t_start
     fitdata = FitData(fit_result)
     fitdata.set_fit_model(fit_model)
     fitdata.set_fitfun_name(fitfun_name)
@@ -490,13 +592,16 @@ def fit_pipo_img(
         vlvl=1, resample=None,
         **kwargs):
     """Fit PIPO using image data."""
-    t_start = time.time()
+    t_start = time()
 
-    if fit_model not in ['zcq', 'c6v']:
+    if not np.array([inter in fit_model for inter in ['thg', 'shg']]).any():
+        raise Exception("Nonlinear interaction (SHG, THG) not indicated")
+
+    if fit_model not in ['zcq', 'shg_c6v', 'thg_c6v']:
         raise Exception("Unsupported fittig model")
 
-    if use_fit_accel and fit_model != 'c6v':
-        raise Exception("Fit acceleration only supported for c6v")
+    if use_fit_accel and fit_model != 'shg_c6v':
+        raise Exception("Fit acceleration only supported for shg_c6v")
 
     fcfg = ImgFitConfig()
     fcfg.set_fit_model(fit_model)
@@ -554,9 +659,9 @@ def fit_pipo_img(
 
     ind_fit = 0
     fit_result = []
-    t_last_prog_update = time.time()
-    t_last_hist_prog_update = time.time()
-    t_fit_start = time.time()
+    t_last_prog_update = time()
+    t_last_hist_prog_update = time()
+    t_fit_start = time()
     for ind_row in range(num_row):
         for ind_col in range(num_col):
             if not fit_mask[ind_row, ind_col]:
@@ -564,7 +669,7 @@ def fit_pipo_img(
             if ind_fit == num_pts_to_fit:
                 break
 
-            t_now = time.time()
+            t_now = time()
             if t_now - t_last_prog_update > 0.5:
                 t_last_prog_update = t_now
                 elapsed_time = t_now - t_fit_start
@@ -577,16 +682,19 @@ def fit_pipo_img(
 
             if with_hist_prog_update and t_now - t_last_hist_prog_update > hist_prog_update_period:
                 try:
+                    print("Updating progress figure")
                     t_last_hist_prog_update = t_now
                     ax = kwargs.get('ratio_hist_ax', plt.gca())
                     ax.cla()
                     zzz_arr = [fr1.result.x[2] for fr1 in fit_result]
                     ax.hist(zzz_arr, bins=np.linspace(0.5, 3, 100))
+                    plt.title("Fitting progress: {:d}/{:d} points".format(ind_fit+1, num_pts_to_fit))
                     ax.set_xlabel('R ratio')
                     ax.set_ylabel('Count')
                     ax.figure.canvas.draw()
                     ax.figure.canvas.show()
                     plt.draw()
+                    plt.gcf().canvas.draw()
                     plt.pause(0.001)
                 except Exception:
                     print("Could not draw histogram update figure")
@@ -607,7 +715,8 @@ def fit_pipo_img(
                 else:
                     vlvl1 = 0
                 fit_result1 = fit_pipo_1point(
-                    pipo_arr1, fit_model=fit_model,
+                    pipo_arr=pipo_arr1,
+                    fit_model=fit_model,
                     plot_progress=plot_progress, use_fit_accel=use_fit_accel,
                     print_results=False, plot_fig=False,
                     vlvl=vlvl1,
@@ -624,7 +733,7 @@ def fit_pipo_img(
             fit_result.append(fit_result1)
             ind_fit += 1
 
-    elapsed_time = time.time() - t_fit_start
+    elapsed_time = time() - t_fit_start
     fit_rate = num_pts_to_fit/elapsed_time
     print("Fitting completed in {:.1f} s at {:.1f} pts/s rate".format(elapsed_time, fit_rate))
 
@@ -644,6 +753,188 @@ def fit_pipo_img(
 
     return imgfitdata
 
+
+def bin_pixels(img, target_sz):
+    """Bin image pixels to reduce resolution for fitting.
+
+    NOTE: This is a quick and hacky function developed for the
+    fit_pipo_img_alt_proto() test and should not be used elsewhere. It doesn't
+    work for non-intenger bins, and there are better ways to do binning.
+    """
+    ind_arr1 = np.linspace(0, img.shape[0], target_sz[0]+1).astype('int')
+    ind_arr2 = np.linspace(0, img.shape[1], target_sz[1]+1).astype('int')
+
+    img_out = np.ndarray([*target_sz, *img.shape[2:]])
+    img_out.fill(np.nan)
+    for out_ind1 in range(target_sz[0]):
+        in_ind1_from = ind_arr1[out_ind1]
+        in_ind1_to = ind_arr1[out_ind1+1]
+        for out_ind2 in range(target_sz[1]):
+            in_ind2_from = ind_arr2[out_ind2]
+            in_ind2_to = ind_arr2[out_ind2+1]
+            img_out[out_ind1, out_ind2, :, :] = img[in_ind1_from:in_ind1_to, in_ind2_from:in_ind2_to, :, :].sum(0).sum(0)
+
+    return img_out
+
+def find_first_true_index(arr):
+    """Find the first index of an element in an array that is True."""
+    return np.unravel_index(np.where(arr.flatten())[0][0], arr.shape)
+
+def fit_pipo_img_alt_proto(
+        data_file_name='data.npy', bin_sz=100, fit_model='thg_c6v',
+        fit_algorithm='scipy_minimize', fit_result_file_name='fit_results.npy',
+        debug_plot=False):
+    """Fit a PIPO image with THG data.
+
+    NOTE: This is an alternative prototype fitting routine for testing THG C6v
+    PIPO fitting which cannot be handled by the main fit_pipo_img() routine
+    yet. Use the fit_pipo_img() routine whenever possible, this code will
+    hopefully be intergrated into main once it is working.
+
+    This routine has only been tested on 8x8 and 9x9 THG PIPO data and only
+    with 'thg_c6v' model using 'scipy_minimize'. Input data has to be in the
+    'data.npy' file located in the current dir, fit results will be stored in
+    the same directory in a file called 'fit_results.npy'.
+    """
+    print("=== pynlopol ===")
+    print("=== Nonlinear polarimetry fitting ===")
+    print("This program will fit a nonlinear polarimetry model to the data "
+          "provided")
+    print("Fit model: ", fit_model)
+    print("Algorithm: ", fit_algorithm)
+
+    print("Loading data from file {:s}...".format(data_file_name))
+    pipo_data = np.load(data_file_name)
+    print("OK")
+
+    [num_psg, num_psa] = np.shape(pipo_data)[2:]
+    print("Polarimetric data format: PIPO {:d}x{:d}".format(num_psg, num_psa))
+    if num_psg < 8 or num_psg > 9 or num_psa < 8 or num_psa > 9:
+        print("WARNING: Unexpected data format. PIPO 8x8 and 9x9 are "
+              "supported, but will try anyway.")
+
+    total_img = pipo_data.sum(2).sum(2)
+    img_shape = np.shape(total_img)
+    num_px = np.prod(img_shape)
+    total_counts = int(np.sum(total_img.flatten()))
+    avg_counts_px = np.sum(total_img.flatten())/num_px
+
+    print("Image size: ", img_shape)
+    print("Total number of counts: {:d}".format(total_counts))
+    print("Average counts per pixel: {:.1f}".format(avg_counts_px))
+
+    print("Binning data for fitting to ({:d}, {:d})".format(bin_sz, bin_sz))
+
+    if num_psg > 8 or num_psa > 8:
+        print("PIPO data has more than 8 PSG and PSA states. Assuming the "
+              "first 8 states cover the full 180 deg sweep and discarding "
+              "additional states.")
+    pipo_data_bin = bin_pixels(pipo_data, [bin_sz, bin_sz])[:, :, :8, :8]
+
+    pipo_data_to_fit = pipo_data_bin
+    fit_data_shape = pipo_data_to_fit.shape
+    fit_data_num_px = np.prod(fit_data_shape[:2])
+    num_px_to_fit = fit_data_num_px
+    fit_result_arr = None
+    if check_file_exists(fit_result_file_name):
+        fit_result_arr = np.load(fit_result_file_name, allow_pickle=True)
+        if fit_result_arr.shape == fit_data_shape[:2]:
+            done_px_inds = fit_result_arr != None
+            num_px_done = np.sum(done_px_inds)
+            frac_done_px = num_px_done/fit_data_num_px
+            if frac_done_px == 1.0:
+                print("Found a fit data file that already contains a completed"
+                      " fit result with the same bin resolution. Continuing "
+                      "will overwrite the stored data and perform the fit "
+                       "again.")
+                input("Press any key to OVERWRITE the fit data and continue "
+                      "with the fit...")
+                fit_result_arr = None
+            else:
+                print("Found a fit data file that contains a partially "
+                      "completed fit ({:.2f}%) at the same bin resolution. "
+                      "Continuing will resume the fit by skipping the pixels "
+                       "that are already done. If you want to start the fit "
+                       "from the beginning, delete the fit data file.".format(
+                           frac_done_px*100))
+                input("Press any key to RESUME a partial fit...")
+                num_px_to_fit -= num_px_done
+        else:
+            print("Found a fit data file, but the shape of the stored fit "
+                  "data is different from the current. Continuing will "
+                  "overwrite the stored fit data. This is normal if you are "
+                  "running a new fit with a different bin setting. If you "
+                  "don't want to overwrite the stored fit data, close the "
+                  "terminal now.")
+            input("Press any key to OVERWRITE the fit data and continue with "
+                  "the fit...")
+            fit_result_arr = None
+
+    if fit_result_arr is None:
+        fit_result_arr = np.ndarray([bin_sz, bin_sz], dtype=FitData)
+
+    plt.figure()
+    plt.subplot(1, 2, 1)
+    plt.imshow(np.log10(total_img))
+    plt.title('Total count image\n({:d}, {:d}), log scale'.format(
+        img_shape[0], img_shape[1]))
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(np.log10(pipo_data_bin.sum(2).sum(2)))
+    plt.title('Binned image\n({:d}, {:d}), log scale'.format(bin_sz, bin_sz))
+
+    print("Showing total count images")
+    print("Close figure to start fitting")
+    plt.show()
+
+    num_px_done = 0
+    num_row, num_col = pipo_data_to_fit.shape[0:2]
+    t_start = time()
+    for ind_row in range(num_row):
+        for ind_col in range(num_col):
+            if fit_result_arr[ind_row, ind_col] != None:
+                continue
+            t_elapsed = time() - t_start
+            print("Pixel {:} of {:}, {:.2f}%, loc ({:}, {:})".format(
+                num_px_done, num_px_to_fit, num_px_done/num_px_to_fit*100,
+                ind_row, ind_col))
+            if num_px_done > 5:
+                print("Elapsed time: {:}. Remaining: {:}".format(
+                    get_human_val_str(t_elapsed, is_time=True),
+                    get_human_val_str(
+                        t_elapsed/num_px_done * (num_px_to_fit - num_px_done),
+                        is_time=True)))
+
+            pipo_data1 = pipo_data_to_fit[ind_row, ind_col, :, :]
+            fit_result = fit_pipo(
+                pipo_arr=pipo_data1,
+                ask_before_overwrite=False,
+                fit_algorithm=fit_algorithm, fit_model=fit_model, use_fit_accel=False,
+                print_results=False, plot_progress=False, show_fig=False)
+
+            fit_result_arr[ind_row, ind_col] = fit_result
+            num_px_done += 1
+            np.save('fit_results.npy', fit_result_arr)
+
+            if debug_plot:
+                par_arr = fit_result.result.x
+                plt.clf()
+                plt.subplot(3, 1, 1)
+                plt.imshow(pipo_data1)
+                plt.colorbar()
+                plt.subplot(3, 1, 2)
+                pipo_best_fit = par_arr[0]*simulate_pipo(
+                    symmetry_str='c6v', nlorder=3, pset_name='pipo_18x9',
+                    delta=par_arr[1], zzzz=par_arr[2], xxxx=par_arr[3])
+                plt.imshow(pipo_best_fit)
+                plt.colorbar()
+                plt.subplot(3, 1, 3)
+                res_map = pipo_data1 - pipo_best_fit
+                res_max = np.max(np.abs([np.min(res_map), np.max(res_map)]))
+                total_err = np.sum(np.abs(res_map.flatten()))
+                plt.imshow(res_map, vmin=-res_max, vmax=res_max, cmap='bwr')
+                plt.colorbar()
+                plt.title('total error={:.3f}Mcnt'.format(total_err*1E-6))
 
 def fit_pipo(
         pipo_arr=None, file_name=None,
@@ -692,8 +983,10 @@ def fit_pipo(
         print("Terminating fitter")
         return None
 
-    fitaccel_filename = get_default_fitaccel_filename()
-    fit_accel = get_fit_accel(kwargs.get('fit_model'))[0]
+    fit_accel = False
+    if kwargs.get('use_fit_accel'):
+        fitaccel_filename = get_default_fitaccel_filename()
+        fit_accel = get_fit_accel(kwargs.get('fit_model'))[0]
 
     if show_input:
         pipo_arr = load_pipo(file_name, binsz=binsz, cropsz=cropsz, **kwargs)
@@ -707,7 +1000,7 @@ def fit_pipo(
 
     ratio_hist_ax = kwargs.get('ratio_hist_ax')
     total_counts_ax = kwargs.get('total_counts_ax')
-    if ratio_hist_ax is None and total_counts_ax is None:
+    if kwargs.get('plot_progress') and ratio_hist_ax is None and total_counts_ax is None:
         print("Fitting progress updates enabled, creating figure")
         plt.clf()
 
@@ -718,7 +1011,7 @@ def fit_pipo(
             else:
                 plt.sca(total_counts_ax)
 
-            plt.imshow(np.mean(np.mean(pipo_arr, 2), 2))
+            plt.imshow(pipo_arr)
             plt.title('Total counts')
         except Exception:
             handle_general_exception("Could not make total counts panel")
@@ -741,4 +1034,4 @@ def fit_pipo(
     if len(np.shape(pipo_arr)) == 4:
         return fit_pipo_img(pipo_arr, fit_accel=fit_accel, **kwargs)
     else:
-        return fit_pipo_1point(pipo_arr, fit_accel=fit_accel, **kwargs)
+        return fit_pipo_1point(pipo_arr=pipo_arr, fit_accel=fit_accel, **kwargs)

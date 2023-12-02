@@ -17,6 +17,8 @@ from lkcom.string import get_human_val_str
 from pynlopol.fitconfig import FitConfig
 from pynlopol.fitdata_base import _FitData_Base
 
+from scipy.optimize._optimize import OptimizeResult
+
 
 class FitData(_FitData_Base):
     """Fit data class."""
@@ -42,13 +44,21 @@ class FitData(_FitData_Base):
             delta_period = 60/180*np.pi
             delta = unwrap_angle(delta, period=delta_period)
             self.par = {'ampl': ampl, 'delta': delta}
-        elif fit_model == 'c6v':
+        elif fit_model == 'shg_c6v':
             ampl = self.result.x[0]
             delta = self.result.x[1]
             zzz = self.result.x[2]
             delta_period = 180/180*np.pi
             delta = unwrap_angle(delta, period=delta_period)
             self.par = {'ampl': ampl, 'zzz': zzz, 'delta': delta}
+        elif fit_model == 'thg_c6v':
+            ampl = self.result.x[0]
+            delta = self.result.x[1]
+            zzzz = self.result.x[2]
+            xxxx = self.result.x[3]
+            delta_period = 180/180*np.pi
+            delta = unwrap_angle(delta, period=delta_period)
+            self.par = {'ampl': ampl, 'zzzz': zzzz, 'xxxx': xxxx, 'delta': delta}
         else:
             print("Cannot handle '{:s}' model".format(fit_model))
 
@@ -56,7 +66,10 @@ class FitData(_FitData_Base):
 
     def get_fit_err(self):
         """Get fit error."""
-        return self.result.fun[0]
+        if isinstance(self.result, OptimizeResult):
+            return self.result.fun
+        else:
+            return self.result.fun[0]
 
     def is_fit_success(self):
         """Return fit success/fail result."""

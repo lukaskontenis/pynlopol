@@ -31,9 +31,9 @@ sim_par = {
     'sample_name': 'c6v',
     'nlorder': 3,
     'delta': 0/180*3.14,
-    'zzzz': 10,
-    'xxxx': 15,
-    'zzxx': 3
+    'zzzz': 3,
+    'xxxx': 3,
+    'zzxx': 1
 }
 
 # Polarization state set, use, for example:
